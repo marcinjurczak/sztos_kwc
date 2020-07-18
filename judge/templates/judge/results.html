@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Results</title>
+</head>
+<body>
+<h1>{{ question.question_title }}</h1>
+<h4>{{ question.question_description }}</h4>
+{% for solution in question.solution_set.all%}
+    <textarea name="solution" id="solution{{ forloop.counter }}" rows="10"
+              cols="50">{{ solution.solution_text }}</textarea><br>
+    <label for="solution{{ forloop.counter }}"></label><br>
+{% endfor %}
+
+<a href="{% url 'judge:detail' question.id %}">Vote again?</a>
+</body>
+</html>
