@@ -5,24 +5,16 @@
     <title>Detail</title>
 </head>
 <body>
-<h1>{{ question.question_title }}</h1>
-<p>{{ question.question_description }}</p>
+<h1>{{ problem.title }}</h1>
+<p>{{ problem.description }}</p>
 
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
-<form action="{% url 'judge:send' question.id %}" method="post">
+<form action="{% url 'judge:send' problem.id %}" method="post">
     {% csrf_token %}
-
-    {% for solution in question.solution_set.all %}
-        <textarea name="solution" id="solution{{ forloop.counter }}" rows="10"
-                  cols="50">{{ solution.solution_text }}</textarea><br>
-        <label for="solution{{ forloop.counter }}">{{ solution.solution_text }}</label><br>
-    {% endfor %}
-    {% if not question.solution_set.all %}
-        <textarea name="solution" id="solution{{ forloop.counter }}" rows="10"
-                  cols="50">{{ solution.solution_text }}</textarea><br>
-        <label for="solution{{ forloop.counter }}">{{ solution.solution_text }}</label><br>
-    {% endif %}
+    <textarea name="solution" id="solution{{ forloop.counter }}" rows="20"
+              cols="80">{{ "Insert your solution here!" }}</textarea>
+    <label for="solution{{ forloop.counter }}"></label><br>
     <input type="submit" value="Send">
 </form>
 </body>

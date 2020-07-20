@@ -5,14 +5,16 @@
     <title>Results</title>
 </head>
 <body>
-<h1>{{ question.question_title }}</h1>
-<h4>{{ question.question_description }}</h4>
-{% for solution in question.solution_set.all%}
-    <textarea name="solution" id="solution{{ forloop.counter }}" rows="10"
-              cols="50">{{ solution.solution_text }}</textarea><br>
-    <label for="solution{{ forloop.counter }}"></label><br>
+<h1>{{ problem.title }}</h1>
+<h4>{{ problem.description }}</h4>
+{% for solution in problem.solution_set.all %}
+    {% if forloop.last %}
+        <textarea name="solution" id="solution{{ forloop.counter }}" rows="20"
+                  cols="80">{{ solution.text }}</textarea><br>
+        <label for="solution{{ forloop.counter }}">Added {{ solution.pub_date }}</label><br>
+    {% endif %}
 {% endfor %}
 
-<a href="{% url 'judge:detail' question.id %}">Vote again?</a>
+<a href="{% url 'judge:detail' problem.id %}">Send again?</a>
 </body>
 </html>

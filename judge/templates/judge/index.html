@@ -5,14 +5,14 @@
     <title>Index</title>
 </head>
 <body>
-{% if latest_question_list %}
+{% if latest_problem_list %}
     <ul>
-        {% for question in latest_question_list %}
-            <li><a href="{% url 'judge:detail' question.id %}">{{ question.question_title }}</a></li>
+        {% for problem in latest_problem_list %}
+            <li><a href="{% url 'judge:detail' problem.id %}">{{ problem.title }}</a></li>
         {% endfor %}
     </ul>
 {% else %}
-    <p>No questions are available.</p>
+    <p>No problems are available.</p>
 {% endif %}
 </body>
 </html>

@@ -2,43 +2,34 @@ from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.views import generic
+import datetime
 
-from .models import Question, Solution
+from .models import Problem, Solution
 
 
-class IndexView(generic.ListView):
+class ProblemIndexView(generic.ListView):
     template_name = 'judge/index.html'
-    context_object_name = 'latest_question_list'
+    context_object_name = 'latest_problem_list'
 
     def get_queryset(self):
-        """Return all published questions."""
-        return Question.objects.order_by('-pub_date')[:]
+        """Return all published problems."""
+        return Problem.objects.order_by('-pub_date')[:]
 
 
-class DetailView(generic.DetailView):
-    model = Question
+class ProblemDetailView(generic.DetailView):
+    model = Problem
     template_name = 'judge/detail.html'
 
 
-class ResultsView(generic.DetailView):
-    model = Question
+class ResultsView(generic.DetailView):  # name?
+    model = Problem
     template_name = 'judge/results.html'
 
 
-def send(request, question_id):
-    question = get_object_or_404(Question, pk=question_id)
-    try:
-        sent_solution = question.solution_set.get(pk=request.POST['solution'])
-    except (KeyError, Solution.DoesNotExist):
-        return render(request, 'judge/detail.html', {
-            'question': question,
-            'error_message': "You didn't send a solution.",
-        })
-    else:
-        sent_solution.votes += 1
-        sent_solution.save()
-        # Always return an HttpResponseRedirect after successfully dealing
-        # with POST data. This prevents data from being posted twice if a
-        # user hits the Back button.
-        return HttpResponseRedirect(reverse('judge:results', args=(question.id,)))
-
+def send_solution(request, problem_id):
+    if request.method == 'POST':
+        solution = request.POST['solution']
+        problem = get_object_or_404(Problem, pk=problem_id)
+        s = Solution(problem=problem, text=solution, pub_date=datetime.datetime.now())
+        s.save()
+        return HttpResponseRedirect(reverse('judge:results', args=(problem.id,)))
