@@ -9,9 +9,9 @@
 <h4>{{ problem.description }}</h4>
 {% for solution in problem.solution_set.all %}
     {% if forloop.last %}
-        <textarea name="solution" id="solution{{ forloop.counter }}" rows="20"
+        <textarea name="solution" id="solution{{ solution.id }}" rows="20"
                   cols="80">{{ solution.text }}</textarea><br>
-        <label for="solution{{ forloop.counter }}">Added {{ solution.pub_date }}</label><br>
+        <label for="solution{{ solution.id }}">Added {{ solution.pub_date }}</label><br>
     {% endif %}
 {% endfor %}
 

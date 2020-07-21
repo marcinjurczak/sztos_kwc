@@ -12,9 +12,9 @@
 
 <form action="{% url 'judge:send' problem.id %}" method="post">
     {% csrf_token %}
-    <textarea name="solution" id="solution{{ forloop.counter }}" rows="20"
+    <textarea name="solution" id="solution{{ solution.id }}" rows="20"
               cols="80">{{ "Insert your solution here!" }}</textarea>
-    <label for="solution{{ forloop.counter }}"></label><br>
+    <label for="solution{{ solution.id }}"></label><br>
     <input type="submit" value="Send">
 </form>
 </body>

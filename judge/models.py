@@ -12,9 +12,6 @@ class Problem(models.Model):
     def __str__(self):
         return self.title
 
-    def was_published_recently(self):
-        return self.pub_date >= timezone.now() - datetime.timedelta(days=1)
-
 
 class Solution(models.Model):
     problem = models.ForeignKey(Problem, on_delete=models.CASCADE)
