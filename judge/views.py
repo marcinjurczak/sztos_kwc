@@ -1,10 +1,10 @@
-from django.shortcuts import get_object_or_404, render
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.views import generic
-import datetime
 
 from .models import Problem, Solution
+from .tasks import validate_solution
 
 
 class ProblemIndexView(generic.ListView):
@@ -30,6 +30,7 @@ def send_solution(request, problem_id):
     if request.method == 'POST':
         solution = request.POST['solution']
         problem = get_object_or_404(Problem, pk=problem_id)
-        s = Solution(problem=problem, text=solution, pub_date=datetime.datetime.now())
+        s = Solution(problem=problem, text=solution)
         s.save()
+        validate_solution.delay(s.id)
         return HttpResponseRedirect(reverse('judge:results', args=(problem.id,)))
