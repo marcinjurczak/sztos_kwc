@@ -4,3 +4,8 @@ services:
     image: rabbitmq
     ports:
       - 5672:5672
+  celery:
+    build: .
+    command: ["celery", "-A", "SZTOS", "worker", "-l", "info", "--broker", "amqp://rabbitmq"]
+    volumes:
+      - ./db.sqlite3:/app/db.sqlite3
