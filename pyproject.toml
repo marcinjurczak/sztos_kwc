@@ -8,6 +8,7 @@ authors = ["Your Name <you@example.com>"]
 python = "^3.6"
 django = "^3.0.8"
 Celery = "^4.4.6"
+minio = "^6.0.0"
 
 [tool.poetry.dev-dependencies]
 
