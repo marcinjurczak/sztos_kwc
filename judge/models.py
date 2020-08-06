@@ -35,12 +35,14 @@ class Solution(models.Model):
 
     def get_source(self) -> str:
         files: List[minio.Object] = list(s3.list_objects(settings.S3_SUBMISSION_BUCKET, f"{self.uuid}/files/"))
+        response = None
         try:
             response = s3.get_object(files[0].bucket_name, files[0].object_name)
             return response.data.decode("utf-8")
         finally:
-            response.close()
-            response.release_conn()
+            if response:
+                response.close()
+                response.release_conn()
 
     def __str__(self):
         return f"Solution({self.id})"
