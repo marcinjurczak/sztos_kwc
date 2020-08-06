@@ -12,7 +12,7 @@
 
 <form action="{% url 'judge:send' problem.id %}" method="post" enctype="multipart/form-data">
     {% csrf_token %}
-    <input type="file" name="source"/>
+    <input type="file" name="source" required/>
     <label for="solution{{ solution.id }}"></label><br>
     <input type="submit" value="Send">
 </form>
