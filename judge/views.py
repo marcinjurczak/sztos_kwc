@@ -28,9 +28,9 @@ class ResultsView(generic.DetailView):  # name?
 
 def send_solution(request, problem_id):
     if request.method == 'POST':
-        solution = request.POST['solution']
         problem = get_object_or_404(Problem, pk=problem_id)
-        s = Solution(problem=problem, text=solution)
+        s = Solution(problem=problem)
+        s.save_file(request.FILES["source"])
         s.save()
         validate_solution.delay(s.id)
         return HttpResponseRedirect(reverse('judge:results', args=(problem.id,)))

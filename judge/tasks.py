@@ -11,7 +11,7 @@ def validate_solution(id: int):
     problem = solution.problem
 
     try:
-        solution.valid = int(solution.text) == len(problem.description)
+        solution.valid = int(solution.get_source()) == len(problem.description)
     except ValueError:
         solution.valid = False
 
