@@ -126,7 +126,11 @@ CELERY_BROKER_URL = "pyamqp://"
 
 # S3 settings
 
-S3_HOST = "localhost:9000"
+if os.environ.get("IN_CONTAINER"):
+    S3_HOST = "s3:9000"
+else:
+    S3_HOST = "localhost:9000"
+
 S3_ACCESS_KEY = "minioadmin"
 S3_SECRET_KEY = "minioadmin"
 
