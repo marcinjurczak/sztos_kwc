@@ -9,8 +9,11 @@ services:
     command: ["celery", "-A", "SZTOS", "worker", "-l", "info", "--broker", "amqp://rabbitmq"]
     volumes:
       - ./db.sqlite3:/app/db.sqlite3
+    environment:
+      - IN_CONTAINER=1
   s3:
     image: minio/minio
     ports:
       - 9000:9000
     command: server /data
+
