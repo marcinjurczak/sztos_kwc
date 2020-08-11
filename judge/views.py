@@ -24,11 +24,6 @@ class ProblemDetailView(FormMixin, generic.DetailView):
     template_name = 'judge/detail.html'
 
 
-class ResultsView(generic.DetailView):  # name?
-    model = Problem
-    template_name = 'judge/results.html'
-
-
 def send_solution(request, problem_id):
     if request.method == 'POST':
         problem = get_object_or_404(Problem, pk=problem_id)
@@ -36,4 +31,4 @@ def send_solution(request, problem_id):
         s.save_file(request.FILES["source"])
         s.save()
         validate_solution.delay(s.id)
-        return HttpResponseRedirect(reverse('judge:results', args=(problem.id,)))
+        return HttpResponseRedirect(reverse('judge:detail', args=(problem.id,)))
