@@ -2,4 +2,7 @@ from django import forms
 
 
 class SendSolutionForm(forms.Form):
-    source = forms.FileField(label='Send a file')
+    sources = forms.FileField(
+        label='Send a file',
+        widget=forms.ClearableFileInput(attrs={"multiple": True})
+    )

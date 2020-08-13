@@ -1,12 +1,13 @@
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404
-from django.views.generic.edit import FormMixin
 from django.urls import reverse
 from django.views import generic
+from django.views.decorators.http import require_POST
+from django.views.generic.edit import FormMixin
 
+from .forms import SendSolutionForm
 from .models import Problem, Solution
 from .tasks import validate_solution
-from .forms import SendSolutionForm
 
 
 class ProblemIndexView(generic.ListView):
@@ -24,11 +25,18 @@ class ProblemDetailView(FormMixin, generic.DetailView):
     template_name = 'judge/detail.html'
 
 
+@require_POST
 def send_solution(request, problem_id):
-    if request.method == 'POST':
-        problem = get_object_or_404(Problem, pk=problem_id)
-        s = Solution(problem=problem)
-        s.save_file(request.FILES["source"])
-        s.save()
-        validate_solution.delay(s.id)
-        return HttpResponseRedirect(reverse('judge:detail', args=(problem.id,)))
+    problem = get_object_or_404(Problem, pk=problem_id)
+
+    if not request.FILES.getlist("sources"):
+        return HttpResponseBadRequest("No files sent.")
+
+    solution = Solution(problem=problem)
+
+    for file in request.FILES.getlist("sources"):
+        solution.save_file(file)
+
+    solution.save()
+    validate_solution.delay(solution.id)
+    return HttpResponseRedirect(reverse('judge:detail', args=(problem.id,)))
