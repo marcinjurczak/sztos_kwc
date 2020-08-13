@@ -5,6 +5,7 @@ import minio
 from django.conf import settings
 from django.core.files import File
 from django.db import models
+from django.contrib.auth.models import User
 
 from judge.storage import s3
 
@@ -24,6 +25,7 @@ class Solution(models.Model):
         IN_PROGRESS = 1
         VALIDATED = 2
 
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="solution", null=True)
     problem = models.ForeignKey(Problem, on_delete=models.CASCADE)
     pub_date = models.DateTimeField('date published', auto_now_add=True)
     state = models.IntegerField(choices=State.choices, default=State.PENDING)
