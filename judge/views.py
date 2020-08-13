@@ -1,4 +1,4 @@
-from django.http import HttpResponseRedirect, HttpResponseBadRequest
+from django.http import HttpResponseRedirect, HttpResponseBadRequest, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.views import generic
@@ -26,7 +26,7 @@ class ProblemDetailView(FormMixin, generic.DetailView):
 
 
 @require_POST
-def send_solution(request, problem_id):
+def send_solution(request, problem_id) -> HttpResponse:
     problem = get_object_or_404(Problem, pk=problem_id)
 
     if not request.FILES.getlist("sources"):

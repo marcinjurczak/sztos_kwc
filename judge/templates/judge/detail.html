@@ -21,7 +21,11 @@
     {% if forloop.last %}
         <h4>State: {{ solution.get_state_display }}</h4>
         <h4>Valid: {{ solution.valid }}</h4>
-        <pre>{{ solution.get_source }}</pre>
+        {% for name, source in solution.get_sources.items %}
+            <h5>{{ name }}</h5>
+            <pre>{{ source }}</pre>
+        {% endfor %}
+
         <label for="solution{{ solution.id }}">Added {{ solution.pub_date }}</label><br>
     {% endif %}
 {% endfor %}
