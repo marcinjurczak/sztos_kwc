@@ -5,26 +5,30 @@
     <title>Detail</title>
 </head>
 <body>
-{% block content %}
     <p>Logged in as {{ user }}</p>
     <h1>{{ problem.title }}</h1>
     <h2>{{ problem.description }}</h2>
 
     {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
-    <form action="{% url 'judge:send' problem.id %}" method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form }}
-        <input type="submit" value="Send">
-    </form>
+<form action="{% url 'judge:send' problem.id %}" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form }}
+    <input type="submit" value="Send">
+</form>
 
-    <h2>Results</h2>
-    {% for solution in user.solution.all %}
+<h2>Results</h2>
+{% for solution in user.solution.all %}
+    {% if forloop.last %}
         <h4>State: {{ solution.get_state_display }}</h4>
         <h4>Valid: {{ solution.valid }}</h4>
-        <pre>{{ solution.get_source }}</pre>
+        {% for name, source in solution.get_sources.items %}
+            <h5>{{ name }}</h5>
+            <pre>{{ source }}</pre>
+        {% endfor %}
+
         <label for="solution{{ solution.id }}">Added {{ solution.pub_date }}</label><br>
-    {% endfor %}
-{% endblock %}
+    {% endif %}
+{% endfor %}
 </body>
 </html>
