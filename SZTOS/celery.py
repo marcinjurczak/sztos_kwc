@@ -7,4 +7,3 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "SZTOS.settings")
 app = Celery("SZTOS")
 app.config_from_object("django.conf:settings", namespace="CELERY")
 app.autodiscover_tasks()
-

@@ -139,4 +139,3 @@ S3_SUBMISSION_BUCKET = "submissions"
 # Login settings
 
 LOGIN_REDIRECT_URL = '/'
-
