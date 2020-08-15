@@ -26,7 +26,8 @@ class ProblemDetailView(FormMixin, generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["solution"] = Solution.objects.filter(user__id=self.request.user.id, problem__pk=self.kwargs.get('pk'))
+        context["solution"] = Solution.objects.filter(user__id=self.request.user.id,
+                                                      problem__pk=self.kwargs.get('pk')).last()
         return context
 
 
