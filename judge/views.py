@@ -24,6 +24,11 @@ class ProblemDetailView(FormMixin, generic.DetailView):
     form_class = SendSolutionForm
     template_name = 'judge/detail.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["solution"] = Solution.objects.filter(user__id=self.request.user.id, problem__pk=self.kwargs.get('pk'))
+        return context
+
 
 @require_POST
 def send_solution(request, problem_id) -> HttpResponse:
