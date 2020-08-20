@@ -30,8 +30,9 @@ def validate(solution: Solution) -> bool:
     log: Logger = get_task_logger("validate")
     tmp_dir = TemporaryDirectory()
     source_path = Path(tmp_dir.name).joinpath("main.c")
+    source = list(solution.get_sources().values())[0]
     with source_path.open("wb") as source_file:
-        source_file.write(solution.get_source().encode("utf-8"))
+        source_file.write(source.encode("utf-8"))
 
     # call gcc
     gcc = Popen(["gcc", "main.c"], text=True, cwd=tmp_dir.name, stdout=PIPE, stderr=STDOUT)
