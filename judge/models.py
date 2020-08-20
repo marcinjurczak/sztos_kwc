@@ -22,6 +22,8 @@ class Solution(models.Model):
         PENDING = 0
         IN_PROGRESS = 1
         VALIDATED = 2
+        COMPILATION_FAILED = 3
+        CRASHED = 4
 
     problem = models.ForeignKey(Problem, on_delete=models.CASCADE)
     pub_date = models.DateTimeField('date published', auto_now_add=True)
