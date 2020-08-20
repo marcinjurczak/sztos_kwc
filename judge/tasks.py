@@ -17,7 +17,8 @@ def validate_solution(id: int):
 
     try:
         solution.valid = validate(solution)
-    except ValueError:
+    except Exception as e:
+        get_task_logger(__name__).error("An exception was thrown during validation.", e)
         solution.valid = False
 
     if solution.state == Solution.State.IN_PROGRESS:
@@ -27,21 +28,24 @@ def validate_solution(id: int):
 
 
 def validate(solution: Solution) -> bool:
-    log: Logger = get_task_logger("validate")
+    log: Logger = get_task_logger(__name__)
     tmp_dir = TemporaryDirectory()
-    source_path = Path(tmp_dir.name).joinpath("main.c")
-    source = list(solution.get_sources().values())[0]
-    with source_path.open("wb") as source_file:
-        source_file.write(source.encode("utf-8"))
+    source_path = Path(tmp_dir.name)
+    sources = solution.get_sources()
+    for name, content in sources.items():
+        with source_path.joinpath(name).open("wb") as source_file:
+            source_file.write(content.encode("utf-8"))
 
     # call gcc
-    gcc = Popen(["gcc", "main.c"], text=True, cwd=tmp_dir.name, stdout=PIPE, stderr=STDOUT)
+    log.debug("Compiling")
+    gcc = Popen(["gcc", *sources.keys()], text=True, cwd=tmp_dir.name, stdout=PIPE, stderr=STDOUT)
     stdout, _ = gcc.communicate()
     if gcc.returncode != 0:
         log.info(f"Compilation failed. GCC exited with error code {gcc.returncode}.")
         log.info(f"stdout: {stdout}")
         solution.state = Solution.State.COMPILATION_FAILED
     else:
+        log.debug("Running")
         program = Popen(["./a.out"], text=True, cwd=tmp_dir.name, stdout=PIPE)
         stdout, _ = program.communicate()
         if program.returncode != 0:
@@ -49,6 +53,7 @@ def validate(solution: Solution) -> bool:
             log.info(f"stdout: {stdout}")
             solution.state = Solution.State.CRASHED
         else:
+            log.debug("Validating")
             valid = stdout.strip() == solution.problem.description.strip()
             if not valid:
                 print(f"expected: {solution.problem.description}")
