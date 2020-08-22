@@ -24,7 +24,7 @@ class Solution(models.Model):
         IN_PROGRESS = 1
         VALIDATED = 2
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="solution", null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="solution")
     problem = models.ForeignKey(Problem, on_delete=models.CASCADE)
     pub_date = models.DateTimeField('date published', auto_now_add=True)
     state = models.IntegerField(choices=State.choices, default=State.PENDING)
