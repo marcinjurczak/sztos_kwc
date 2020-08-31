@@ -1,18 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Index</title>
-</head>
-<body>
-{% if latest_problem_list %}
-    <ul>
-        {% for problem in latest_problem_list %}
-            <li><a href="{% url 'judge:detail' problem.id %}">{{ problem.title }}</a></li>
-        {% endfor %}
-    </ul>
-{% else %}
-    <p>No problems are available.</p>
-{% endif %}
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block title %}Problems{% endblock %}
+
+{% block content %}
+    {% if latest_problem_list %}
+        <ul>
+            {% for problem in latest_problem_list %}
+                <li><a href="{% url 'judge:detail' problem.id %}">{{ problem.title }}</a></li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No problems are available.</p>
+    {% endif %}
+{% endblock %}
