@@ -18,6 +18,12 @@ class Problem(models.Model):
         return self.title
 
 
+class TestCase(models.Model):
+    problem = models.ForeignKey(Problem, on_delete=models.CASCADE, related_name="test_cases")
+    input = models.TextField()
+    expected_output = models.TextField()
+
+
 class Solution(models.Model):
     class State(models.IntegerChoices):
         PENDING = 0
