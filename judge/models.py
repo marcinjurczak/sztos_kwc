@@ -47,3 +47,11 @@ class Solution(models.Model):
 
     def __str__(self):
         return f"Solution({self.id})"
+
+
+class TestRun(models.Model):
+    test_case = models.ForeignKey(TestCase, on_delete=models.CASCADE)
+    solution = models.ForeignKey(Solution, on_delete=models.DO_NOTHING)
+    stdout = models.TextField()
+    stderr = models.TextField()
+    return_code = models.IntegerField()

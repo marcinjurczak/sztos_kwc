@@ -7,7 +7,7 @@ from tempfile import TemporaryDirectory
 from celery import shared_task
 from celery.utils.log import get_task_logger
 
-from .models import Solution, TestCase
+from .models import Solution, TestCase, TestRun
 
 
 @shared_task()
@@ -48,9 +48,17 @@ def validate(solution: Solution) -> bool:
     else:
         valid = True
         for test_case in solution.problem.test_cases.all():
-            program = Popen(["./a.out"], text=True, cwd=tmp_dir.name, stdin=PIPE, stdout=PIPE)
+            program = Popen(["./a.out"], text=True, cwd=tmp_dir.name, stdin=PIPE, stdout=PIPE, stderr=PIPE)
             log.debug("Running")
-            stdout, _ = program.communicate(input=test_case.input)
+            stdout, stderr = program.communicate(input=test_case.input)
+            test_run = TestRun(
+                solution=solution,
+                test_case=test_case,
+                stdout=stdout,
+                stderr=stderr,
+                return_code=program.returncode,
+            )
+            test_run.save()
             if program.returncode != 0:
                 log.info(f"Program exited with error code {program.returncode}.")
                 log.info(f"stdout: {stdout}")
