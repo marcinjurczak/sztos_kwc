@@ -1,3 +1,4 @@
+from io import StringIO
 from logging import Logger
 from pathlib import Path
 from subprocess import Popen, PIPE, STDOUT
@@ -6,7 +7,7 @@ from tempfile import TemporaryDirectory
 from celery import shared_task
 from celery.utils.log import get_task_logger
 
-from .models import Solution
+from .models import Solution, TestCase
 
 
 @shared_task()
@@ -45,22 +46,22 @@ def validate(solution: Solution) -> bool:
         log.info(f"stdout: {stdout}")
         solution.state = Solution.State.COMPILATION_FAILED
     else:
-        log.debug("Running")
-        program = Popen(["./a.out"], text=True, cwd=tmp_dir.name, stdout=PIPE)
-        stdout, _ = program.communicate()
-        if program.returncode != 0:
-            log.info(f"Program exited with error code {program.returncode}.")
-            log.info(f"stdout: {stdout}")
-            solution.state = Solution.State.CRASHED
-        else:
-            log.debug("Validating")
-            valid = stdout.strip() == solution.problem.description.strip()
-            if not valid:
-                print(f"expected: {solution.problem.description}")
-                print(f"actual: {stdout}")
+        valid = True
+        for test_case in solution.problem.test_cases.all():
+            program = Popen(["./a.out"], text=True, cwd=tmp_dir.name, stdin=PIPE, stdout=PIPE)
+            log.debug("Running")
+            stdout, _ = program.communicate(input=test_case.input)
+            if program.returncode != 0:
+                log.info(f"Program exited with error code {program.returncode}.")
+                log.info(f"stdout: {stdout}")
+                solution.state = Solution.State.CRASHED
+            else:
+                log.debug("Validating")
+                if valid:
+                    valid = stdout.strip() == test_case.expected_output.strip()
 
-            tmp_dir.cleanup()
-            return valid
+        tmp_dir.cleanup()
+        return valid
 
     tmp_dir.cleanup()
     return False
