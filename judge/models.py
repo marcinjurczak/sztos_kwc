@@ -4,6 +4,7 @@ from uuid import uuid4
 from django.conf import settings
 from django.core.files import File
 from django.db import models
+from django.contrib.auth.models import User
 
 from judge.storage import s3, get_directory
 
@@ -25,6 +26,7 @@ class Solution(models.Model):
         COMPILATION_FAILED = 3
         CRASHED = 4
 
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="solutions", default=None)
     problem = models.ForeignKey(Problem, on_delete=models.CASCADE)
     pub_date = models.DateTimeField('date published', auto_now_add=True)
     state = models.IntegerField(choices=State.choices, default=State.PENDING)

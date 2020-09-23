@@ -135,3 +135,7 @@ S3_ACCESS_KEY = "minioadmin"
 S3_SECRET_KEY = "minioadmin"
 
 S3_SUBMISSION_BUCKET = "submissions"
+
+# Login settings
+
+LOGIN_REDIRECT_URL = '/'
