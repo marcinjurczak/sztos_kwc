@@ -26,17 +26,15 @@ class TestCase(models.Model):
 
 class Solution(models.Model):
     class State(models.IntegerChoices):
-        PENDING = 0
-        IN_PROGRESS = 1
-        VALIDATED = 2
+        COMPILATION_PENDING = 0
+        COMPILATION_IN_PROGRESS = 1
+        COMPILATION_SUCCESSFUL = 2
         COMPILATION_FAILED = 3
-        CRASHED = 4
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="solutions", default=None)
     problem = models.ForeignKey(Problem, on_delete=models.CASCADE)
     pub_date = models.DateTimeField('date published', auto_now_add=True)
-    state = models.IntegerField(choices=State.choices, default=State.PENDING)
-    valid = models.NullBooleanField()
+    state = models.IntegerField(choices=State.choices, default=State.COMPILATION_PENDING)
     uuid = models.UUIDField(default=uuid4, editable=False)
 
     def save_file(self, file: File) -> None:
@@ -50,8 +48,15 @@ class Solution(models.Model):
 
 
 class TestRun(models.Model):
+    class State(models.IntegerChoices):
+        VALID = 0
+        CRASHED = 1
+        INVALID = 2
+        TIMED_OUT = 3
+
     test_case = models.ForeignKey(TestCase, on_delete=models.CASCADE)
     solution = models.ForeignKey(Solution, on_delete=models.DO_NOTHING)
     stdout = models.TextField()
     stderr = models.TextField()
     return_code = models.IntegerField()
+    state = models.IntegerField(choices=State.choices)

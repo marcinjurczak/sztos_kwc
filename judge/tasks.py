@@ -1,4 +1,3 @@
-from io import StringIO
 from logging import Logger
 from pathlib import Path
 from subprocess import Popen, PIPE, STDOUT
@@ -7,28 +6,22 @@ from tempfile import TemporaryDirectory
 from celery import shared_task
 from celery.utils.log import get_task_logger
 
-from .models import Solution, TestCase, TestRun
+from .models import Solution, TestRun
 
 
 @shared_task()
 def validate_solution(id: int):
     solution = Solution.objects.get(pk=id)
-    solution.state = Solution.State.IN_PROGRESS
+    solution.state = Solution.State.COMPILATION_IN_PROGRESS
     solution.save()
 
     try:
-        solution.valid = validate(solution)
+        validate(solution)
     except Exception as e:
         get_task_logger(__name__).error("An exception was thrown during validation.", e)
-        solution.valid = False
-
-    if solution.state == Solution.State.IN_PROGRESS:
-        solution.state = Solution.State.VALIDATED
-
-    solution.save()
 
 
-def validate(solution: Solution) -> bool:
+def validate(solution: Solution) -> None:
     log: Logger = get_task_logger(__name__)
     tmp_dir = TemporaryDirectory()
     source_path = Path(tmp_dir.name)
@@ -45,12 +38,15 @@ def validate(solution: Solution) -> bool:
         log.info(f"Compilation failed. GCC exited with error code {gcc.returncode}.")
         log.info(f"stdout: {stdout}")
         solution.state = Solution.State.COMPILATION_FAILED
+        solution.save()
     else:
-        valid = True
+        solution.state = Solution.State.COMPILATION_SUCCESSFUL
+        solution.save()
         for test_case in solution.problem.test_cases.all():
             program = Popen(["./a.out"], text=True, cwd=tmp_dir.name, stdin=PIPE, stdout=PIPE, stderr=PIPE)
             log.debug("Running")
             stdout, stderr = program.communicate(input=test_case.input)
+
             test_run = TestRun(
                 solution=solution,
                 test_case=test_case,
@@ -58,18 +54,18 @@ def validate(solution: Solution) -> bool:
                 stderr=stderr,
                 return_code=program.returncode,
             )
-            test_run.save()
+
             if program.returncode != 0:
                 log.info(f"Program exited with error code {program.returncode}.")
                 log.info(f"stdout: {stdout}")
-                solution.state = Solution.State.CRASHED
+                test_run.state = TestRun.State.CRASHED
             else:
                 log.debug("Validating")
-                if valid:
-                    valid = stdout.strip() == test_case.expected_output.strip()
+                if stdout.strip() == test_case.expected_output.strip():
+                    test_run.state = TestRun.State.VALID
+                else:
+                    test_run.state = TestRun.State.INVALID
 
-        tmp_dir.cleanup()
-        return valid
+            test_run.save()
 
     tmp_dir.cleanup()
-    return False
