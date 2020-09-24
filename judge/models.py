@@ -20,7 +20,7 @@ class Problem(models.Model):
 
 class TestCase(models.Model):
     problem = models.ForeignKey(Problem, on_delete=models.CASCADE, related_name="test_cases")
-    input = models.TextField()
+    input = models.TextField(blank=True)
     expected_output = models.TextField()
 
 
