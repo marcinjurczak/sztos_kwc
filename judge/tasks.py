@@ -43,17 +43,21 @@ def validate(solution: Solution) -> None:
         solution.state = Solution.State.COMPILATION_SUCCESSFUL
         solution.save()
         for test_case in solution.problem.test_cases.all():
+            test_run = TestRun(
+                solution=solution,
+                test_case=test_case,
+            )
+            test_run.save()
+
+        for test_run in solution.test_runs.all():
+            test_case = test_run.test_case
             program = Popen(["./a.out"], text=True, cwd=tmp_dir.name, stdin=PIPE, stdout=PIPE, stderr=PIPE)
             log.debug("Running")
             stdout, stderr = program.communicate(input=test_case.input)
 
-            test_run = TestRun(
-                solution=solution,
-                test_case=test_case,
-                stdout=stdout,
-                stderr=stderr,
-                return_code=program.returncode,
-            )
+            test_run.stdout = stdout
+            test_run.stderr = stderr
+            test_run.return_code = program.returncode
 
             if program.returncode != 0:
                 log.info(f"Program exited with error code {program.returncode}.")

@@ -53,10 +53,11 @@ class TestRun(models.Model):
         CRASHED = 1
         INVALID = 2
         TIMED_OUT = 3
+        PENDING = 4
 
     test_case = models.ForeignKey(TestCase, on_delete=models.CASCADE)
-    solution = models.ForeignKey(Solution, on_delete=models.DO_NOTHING)
-    stdout = models.TextField()
-    stderr = models.TextField()
-    return_code = models.IntegerField()
-    state = models.IntegerField(choices=State.choices)
+    solution = models.ForeignKey(Solution, on_delete=models.DO_NOTHING, related_name="test_runs")
+    stdout = models.TextField(null=True)
+    stderr = models.TextField(null=True)
+    return_code = models.IntegerField(null=True)
+    state = models.IntegerField(choices=State.choices, default=State.PENDING)
