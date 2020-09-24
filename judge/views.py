@@ -6,7 +6,7 @@ from django.views.decorators.http import require_POST
 from django.views.generic.edit import FormMixin
 
 from .forms import SendSolutionForm
-from .models import Problem, Solution
+from .models import Problem, Solution, TestRun
 from .tasks import validate_solution
 
 
@@ -26,8 +26,15 @@ class ProblemDetailView(FormMixin, generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["solution"] = Solution.objects.filter(user__id=self.request.user.id,
-                                                      problem__pk=self.kwargs.get('pk')).last()
+        solution = Solution.objects.filter(
+            user__id=self.request.user.id,
+            problem__pk=self.kwargs.get('pk')
+        ).last()
+        context["solution"] = solution
+        if solution.test_runs.count() > 0:
+            context["grade"] = solution.test_runs.filter(state=TestRun.State.VALID).count() / solution.test_runs.count()
+        else:
+            context["grade"] = 0
         return context
 
 

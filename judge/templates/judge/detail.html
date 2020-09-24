@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
+{% load filters %}
 
-{% block title %}Details{% endblock %}
+{% block title %}Detail{% endblock %}
 
 {% block content %}
-    <p>Logged in as {{ user }}</p>
-    <h1>{{ problem.title }}</h1>
-    <h2>{{ problem.description }}</h2>
+<h1>{{ problem.title }}</h1>
+<h2>{{ problem.description }}</h2>
 
     {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
@@ -15,9 +15,22 @@
         <input type="submit" value="Send">
     </form>
     {% if solution %}
-        <h2>Results</h2>
-        <h4>State: {{ solution.get_state_display }}</h4>
-        <h4>Valid: {{ solution.valid }}</h4>
+        <h2>Status: {{ solution.get_state_display }}</h2>
+        {% if solution.test_runs.count > 0 %}
+            <h2>Grade: {{ grade | percentage }}</h2>
+        <table>
+        <tr>
+            <td>#</td>
+            <td>State</td>
+        </tr>
+        {% for test_run in solution.test_runs.all %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ test_run.get_state_display }}</td>
+        </tr>
+        {% endfor %}
+        </table>
+        {% endif %}
         {% for name, source in solution.get_sources.items %}
             <h5>{{ name }}</h5>
             <pre>{{ source }}</pre>
