@@ -10,8 +10,16 @@ from .models import Problem, Solution, TestRun
 from .tasks import validate_solution
 
 
-class ProblemIndexView(generic.ListView):
+class IndexView(generic.ListView):
     template_name = 'judge/index.html'
+
+    def get_queryset(self):
+        """Return all published problems."""
+        return Problem.objects.order_by('-pub_date')[:]
+
+
+class ProblemListView(generic.ListView):
+    template_name = 'judge/problems.html'
     context_object_name = 'latest_problem_list'
 
     def get_queryset(self):
@@ -30,10 +38,12 @@ class ProblemDetailView(FormMixin, generic.DetailView):
             user__id=self.request.user.id,
             problem__pk=self.kwargs.get('pk')
         ).last()
+        context['user'] = self.request.user.is_authenticated
         context["solution"] = solution
         if solution:
             if solution.test_runs.count() > 0:
-                context["grade"] = solution.test_runs.filter(state=TestRun.State.VALID).count() / solution.test_runs.count()
+                context["grade"] = solution.test_runs.filter(
+                    state=TestRun.State.VALID).count() / solution.test_runs.count()
             else:
                 context["grade"] = 0
         return context

@@ -5,6 +5,13 @@
     <title>{% block title %}{% endblock %}</title>
 </head>
 <body>
+{% block nav %}
+    <ul id="nav">
+        <li>{% block nav-home %}<a href="{% url 'judge:problems' %}">Problems</a>{% endblock %}</li>
+        <li>{% block nav-login %}<a href="{% url 'login' %}">Login</a>{% endblock %}</li>
+        <li>{% block nav-logout %}<a href="{% url 'logout' %}">Logout</a>{% endblock %}</li>
+    </ul>
+{% endblock %}
 {% block content %}
 {% endblock %}
 </body>
