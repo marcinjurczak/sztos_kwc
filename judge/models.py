@@ -9,7 +9,16 @@ from django.contrib.auth.models import User
 from judge.storage import s3, get_directory
 
 
+class Course(models.Model):
+    name = models.CharField(max_length=100)
+    assigned_users = models.ManyToManyField(User)
+
+    def __str__(self):
+        return self.name
+
+
 class Problem(models.Model):
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="courses")
     title = models.CharField(max_length=100)
     description = models.CharField(max_length=1000)
     pub_date = models.DateTimeField('date published')

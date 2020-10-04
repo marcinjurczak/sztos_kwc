@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}Courses{% endblock %}
+
+{% block content %}
+    {% if course_list %}
+        <ul>
+            {% for course in course_list %}
+                <li><a href="{% url 'judge:problems' course.id %}">{{ course.name }}</a></li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No courses are available.</p>
+    {% endif %}
+{% endblock %}
