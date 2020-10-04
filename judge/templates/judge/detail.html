@@ -37,7 +37,8 @@
             {% endfor %}
             <label for="solution{{ solution.id }}">Added {{ solution.pub_date }}</label><br>
         {% endif %}
+    {% else %}
+        <p>You have to be logged in to view this page</p>
     {% endif %}
-    <p>You have to be logged in to view this page</p>
     <a href="{% url 'login' %}">Click here to login</a>
 {% endblock %}

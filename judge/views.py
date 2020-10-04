@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.views import generic
 from django.views.decorators.http import require_POST
+from django.views.generic import TemplateView
 from django.views.generic.edit import FormMixin
 
 from .forms import SendSolutionForm
@@ -10,12 +11,8 @@ from .models import Problem, Solution, TestRun
 from .tasks import validate_solution
 
 
-class IndexView(generic.ListView):
+class IndexView(TemplateView):
     template_name = 'judge/index.html'
-
-    def get_queryset(self):
-        """Return all published problems."""
-        return Problem.objects.order_by('-pub_date')[:]
 
 
 class ProblemListView(generic.ListView):
