@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.views import generic
 from django.views.decorators.http import require_POST
+from django.views.generic import TemplateView
 from django.views.generic.edit import FormMixin
 
 from .forms import SendSolutionForm
@@ -10,8 +11,12 @@ from .models import Problem, Solution, TestRun
 from .tasks import validate_solution
 
 
-class ProblemIndexView(generic.ListView):
+class IndexView(TemplateView):
     template_name = 'judge/index.html'
+
+
+class ProblemListView(generic.ListView):
+    template_name = 'judge/problems.html'
     context_object_name = 'latest_problem_list'
 
     def get_queryset(self):
@@ -30,10 +35,12 @@ class ProblemDetailView(FormMixin, generic.DetailView):
             user__id=self.request.user.id,
             problem__pk=self.kwargs.get('pk')
         ).last()
+        context['user'] = self.request.user.is_authenticated
         context["solution"] = solution
         if solution:
             if solution.test_runs.count() > 0:
-                context["grade"] = solution.test_runs.filter(state=TestRun.State.VALID).count() / solution.test_runs.count()
+                context["grade"] = solution.test_runs.filter(
+                    state=TestRun.State.VALID).count() / solution.test_runs.count()
             else:
                 context["grade"] = 0
         return context

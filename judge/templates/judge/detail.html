@@ -2,39 +2,43 @@
 {% load filters %}
 
 {% block title %}Detail{% endblock %}
-
 {% block content %}
-<h1>{{ problem.title }}</h1>
-<h2>{{ problem.description }}</h2>
+    {% if user %}
+        <h1>{{ problem.title }}</h1>
+        <h2>{{ problem.description }}</h2>
 
-    {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+        {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
-    <form action="{% url 'judge:send' problem.id %}" method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form }}
-        <input type="submit" value="Send">
-    </form>
-    {% if solution %}
-        <h2>Status: {{ solution.get_state_display }}</h2>
-        {% if solution.test_runs.count > 0 %}
-            <h2>Grade: {{ grade | percentage }}</h2>
-        <table>
-        <tr>
-            <td>#</td>
-            <td>State</td>
-        </tr>
-        {% for test_run in solution.test_runs.all %}
-        <tr>
-            <td>{{ forloop.counter }}</td>
-            <td>{{ test_run.get_state_display }}</td>
-        </tr>
-        {% endfor %}
-        </table>
+        <form action="{% url 'judge:send' problem.id %}" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form }}
+            <input type="submit" value="Send">
+        </form>
+        {% if solution %}
+            <h2>Status: {{ solution.get_state_display }}</h2>
+            {% if solution.test_runs.count > 0 %}
+                <h2>Grade: {{ grade | percentage }}</h2>
+                <table>
+                    <tr>
+                        <td>#</td>
+                        <td>State</td>
+                    </tr>
+                    {% for test_run in solution.test_runs.all %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ test_run.get_state_display }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% endif %}
+            {% for name, source in solution.get_sources.items %}
+                <h5>{{ name }}</h5>
+                <pre>{{ source }}</pre>
+            {% endfor %}
+            <label for="solution{{ solution.id }}">Added {{ solution.pub_date }}</label><br>
         {% endif %}
-        {% for name, source in solution.get_sources.items %}
-            <h5>{{ name }}</h5>
-            <pre>{{ source }}</pre>
-        {% endfor %}
-        <label for="solution{{ solution.id }}">Added {{ solution.pub_date }}</label><br>
+    {% else %}
+        <p>You have to be logged in to view this page</p>
     {% endif %}
+    <a href="{% url 'login' %}">Click here to login</a>
 {% endblock %}

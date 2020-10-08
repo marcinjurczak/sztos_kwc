@@ -1,15 +1,8 @@
 {% extends 'base.html' %}
 
-{% block title %}Problems{% endblock %}
+{% block title %}Home{% endblock %}
 
 {% block content %}
-    {% if latest_problem_list %}
-        <ul>
-            {% for problem in latest_problem_list %}
-                <li><a href="{% url 'judge:detail' problem.id %}">{{ problem.title }}</a></li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>No problems are available.</p>
-    {% endif %}
+    <h1>SZTOS</h1>
+    <h2>Home page</h2>
 {% endblock %}
