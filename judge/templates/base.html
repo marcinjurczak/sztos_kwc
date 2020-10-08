@@ -7,9 +7,13 @@
 <body>
 {% block nav %}
     <ul id="nav">
-        <li>{% block nav-home %}<a href="{% url 'judge:problems' %}">Problems</a>{% endblock %}</li>
-        <li>{% block nav-login %}<a href="{% url 'login' %}">Login</a>{% endblock %}</li>
-        <li>{% block nav-logout %}<a href="{% url 'logout' %}">Logout</a>{% endblock %}</li>
+        <li>{% block nav-home %}<a href="{% url 'judge:index' %}">Home</a>{% endblock %}</li>
+        <li>{% block nav-courses %}<a href="{% url 'judge:courses' %}">Courses</a>{% endblock %}</li>
+        {% if user.is_authenticated %}
+            <li>{% block nav-logout %}<a href="{% url 'logout' %}">Logout</a>{% endblock %}</li>
+        {% else %}
+            <li>{% block nav-login %}<a href="{% url 'login' %}">Login</a>{% endblock %}</li>
+        {% endif %}
     </ul>
 {% endblock %}
 {% block content %}

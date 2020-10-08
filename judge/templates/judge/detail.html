@@ -3,7 +3,7 @@
 
 {% block title %}Detail{% endblock %}
 {% block content %}
-    {% if user %}
+    {% if user.is_authenticated %}
         <h1>{{ problem.title }}</h1>
         <h2>{{ problem.description }}</h2>
 
@@ -39,6 +39,7 @@
         {% endif %}
     {% else %}
         <p>You have to be logged in to view this page</p>
+        <a href="{% url 'login' %}">Click here to login</a>
     {% endif %}
     <a href="{% url 'login' %}">Click here to login</a>
 {% endblock %}

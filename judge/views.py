@@ -7,7 +7,7 @@ from django.views.generic import TemplateView
 from django.views.generic.edit import FormMixin
 
 from .forms import SendSolutionForm
-from .models import Problem, Solution, TestRun
+from .models import Course, Problem, Solution, TestRun
 from .tasks import validate_solution
 
 
@@ -15,13 +15,20 @@ class IndexView(TemplateView):
     template_name = 'judge/index.html'
 
 
+class CourseListView(generic.ListView):
+    template_name = 'judge/courses.html'
+    context_object_name = 'course_list'
+
+    def get_queryset(self):
+        return Course.objects.all()
+
+      
 class ProblemListView(generic.ListView):
     template_name = 'judge/problems.html'
     context_object_name = 'latest_problem_list'
 
     def get_queryset(self):
-        """Return all published problems."""
-        return Problem.objects.order_by('-pub_date')[:]
+        return Problem.objects.filter(course__id=self.kwargs.get('pk'))
 
 
 class ProblemDetailView(FormMixin, generic.DetailView):
