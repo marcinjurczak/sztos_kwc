@@ -22,7 +22,7 @@ class CourseListView(generic.ListView):
     def get_queryset(self):
         return Course.objects.all()
 
-
+      
 class ProblemListView(generic.ListView):
     template_name = 'judge/problems.html'
     context_object_name = 'latest_problem_list'
@@ -42,6 +42,7 @@ class ProblemDetailView(FormMixin, generic.DetailView):
             user__id=self.request.user.id,
             problem__pk=self.kwargs.get('pk')
         ).last()
+        context['user'] = self.request.user.is_authenticated
         context["solution"] = solution
         if solution:
             if solution.test_runs.count() > 0:
