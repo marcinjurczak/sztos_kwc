@@ -1,7 +1,8 @@
 from logging import Logger
 from pathlib import Path
-from subprocess import Popen, PIPE, STDOUT
+from subprocess import Popen, PIPE
 from tempfile import TemporaryDirectory
+from typing import Tuple, List, Optional
 
 from celery import shared_task
 from celery.utils.log import get_task_logger
@@ -25,6 +26,8 @@ def validate(solution: Solution) -> None:
     log: Logger = get_task_logger(__name__)
     tmp_dir = TemporaryDirectory()
     source_path = Path(tmp_dir.name)
+    build_path = source_path.joinpath("build")
+    build_path.mkdir()
     sources = solution.get_sources()
     for name, content in sources.items():
         with source_path.joinpath(name).open("wb") as source_file:
@@ -32,11 +35,16 @@ def validate(solution: Solution) -> None:
 
     # call gcc
     log.debug("Compiling")
-    gcc = Popen(["gcc", *sources.keys()], text=True, cwd=tmp_dir.name, stdout=PIPE, stderr=STDOUT)
-    stdout, _ = gcc.communicate()
-    if gcc.returncode != 0:
-        log.info(f"Compilation failed. GCC exited with error code {gcc.returncode}.")
-        log.info(f"stdout: {stdout}")
+    stdout, _stderr, return_code = bwrap_execute(
+        ["g++", *sources.keys(), "-o", "/app/build/a.out"],
+        cwd="/app",
+        ro_binds=[("/lib", "/lib"), ("/lib64", "/lib64"), ("/usr", "/usr"), ("/bin", "/bin")],
+        binds=[(tmp_dir.name, "/app")],
+        unshare_all=True,
+    )
+    if return_code != 0:
+        log.info(f"Compilation failed. GCC exited with error code {return_code}.")
+        log.info(f"stdout: {stdout.decode('utf-8')}")
         solution.state = Solution.State.COMPILATION_FAILED
         solution.save()
     else:
@@ -51,21 +59,26 @@ def validate(solution: Solution) -> None:
 
         for test_run in solution.test_runs.all():
             test_case = test_run.test_case
-            program = Popen(["./a.out"], text=True, cwd=tmp_dir.name, stdin=PIPE, stdout=PIPE, stderr=PIPE)
             log.debug("Running")
-            stdout, stderr = program.communicate(input=test_case.input)
+            stdout, stderr, return_code = bwrap_execute(
+                ["build/a.out"],
+                stdin=test_case.input.encode("utf-8"),
+                cwd="/app",
+                ro_binds=[("/lib", "/lib"), ("/lib64", "/lib64"), ("/usr", "/usr"), (tmp_dir.name, "/app")],
+                unshare_all=True,
+            )
 
-            test_run.stdout = stdout
-            test_run.stderr = stderr
-            test_run.return_code = program.returncode
+            test_run.stdout = stdout.decode("utf-8")
+            test_run.stderr = stderr.decode("utf-8")
+            test_run.return_code = return_code
 
-            if program.returncode != 0:
-                log.info(f"Program exited with error code {program.returncode}.")
+            if return_code != 0:
+                log.info(f"Program exited with error code {return_code}.")
                 log.info(f"stdout: {stdout}")
                 test_run.state = TestRun.State.CRASHED
             else:
                 log.debug("Validating")
-                if stdout.strip() == test_case.expected_output.strip():
+                if test_run.stdout.strip() == test_case.expected_output.strip():
                     test_run.state = TestRun.State.VALID
                 else:
                     test_run.state = TestRun.State.INVALID
@@ -73,3 +86,35 @@ def validate(solution: Solution) -> None:
             test_run.save()
 
     tmp_dir.cleanup()
+
+
+def bwrap_execute(
+        argv: List[str],
+        stdin: bytes = b"",
+        cwd: Optional[str] = None,
+        ro_binds: List[Tuple[str, str]] = None,
+        binds: List[Tuple[str, str]] = None,
+        unshare_all=False,
+) -> Tuple[bytes, bytes, int]:
+    ro_binds = ro_binds if ro_binds else []
+    binds = binds if binds else []
+
+    flags = ["--die-with-parent"]
+    for src, dst in ro_binds:
+        flags += ["--ro-bind", src, dst]
+
+    for src, dst in binds:
+        flags += ["--bind", src, dst]
+
+    if unshare_all:
+        flags.append("--unshare-all")
+
+    if cwd:
+        flags += ["--chdir", cwd]
+
+    args = ["/usr/bin/bwrap", *flags, *argv]
+    print(args)
+    child = Popen(args, stdin=PIPE, stdout=PIPE, stderr=PIPE)
+    stdout, stderr = child.communicate(input=stdin)
+
+    return stdout, stderr, child.returncode
