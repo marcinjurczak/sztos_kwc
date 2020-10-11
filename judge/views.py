@@ -20,7 +20,7 @@ class CourseListView(generic.ListView):
     context_object_name = 'course_list'
 
     def get_queryset(self):
-        return Course.objects.all()
+        return Course.objects.filter(assigned_users__id=self.request.user.id)
 
       
 class ProblemListView(generic.ListView):
@@ -42,7 +42,7 @@ class ProblemDetailView(FormMixin, generic.DetailView):
             user__id=self.request.user.id,
             problem__pk=self.kwargs.get('pk')
         ).last()
-        context['user'] = self.request.user.is_authenticated
+        context['user'] = self.request.user
         context["solution"] = solution
         if solution:
             if solution.test_runs.count() > 0:
