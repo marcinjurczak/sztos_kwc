@@ -3,13 +3,16 @@
 {% block title %}Courses{% endblock %}
 
 {% block content %}
-    {% if course_list %}
-        <ul>
-            {% for course in course_list %}
-                <li><a href="{% url 'judge:problems' course.id %}">{{ course.name }}</a></li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>No courses are available.</p>
-    {% endif %}
+    <div class="list-group">
+        {% if course_list %}
+            <ul>
+                {% for course in course_list %}
+                    <a class="list-group-item list-group-item-action"
+                       href="{% url 'judge:problems' course.id %}">{{ course.name }}</a>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No courses are available.</p>
+        {% endif %}
+    </div>
 {% endblock %}

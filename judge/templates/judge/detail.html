@@ -9,10 +9,14 @@
 
         {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
-        <form action="{% url 'judge:send' problem.id %}" method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            {{ form }}
-            <input type="submit" value="Send">
+        <form class="md-form" action="{% url 'judge:send' problem.id %}" method="POST" enctype="multipart/form-data">
+            <div class="file-field">
+                <div>
+                    {% csrf_token %}
+                    {{ form }}
+                    <input type="submit" value="Send">
+                </div>
+            </div>
         </form>
         {% if solution %}
             <h2>Status: {{ solution.get_state_display }}</h2>
