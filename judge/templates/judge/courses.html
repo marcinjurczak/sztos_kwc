@@ -4,9 +4,10 @@
 
 {% block content %}
     {% if course_list %}
-        <ul>
+        <ul class="list-group">
             {% for course in course_list %}
-                <li><a href="{% url 'judge:problems' course.id %}">{{ course.name }}</a></li>
+                <a class="list-group-item list-group-item-action"
+                   href="{% url 'judge:problems' course.id %}">{{ course.name }}</a>
             {% endfor %}
         </ul>
     {% else %}

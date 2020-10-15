@@ -4,9 +4,10 @@
 
 {% block content %}
     {% if latest_problem_list %}
-        <ul>
+        <ul class="list-group">
             {% for problem in latest_problem_list %}
-                <li><a href="{% url 'judge:detail' problem.id %}">{{ problem.title }}</a></li>
+                <a class="list-group-item list-group-item-action"
+                   href="{% url 'judge:detail' problem.id %}">{{ problem.title }}</a>
             {% endfor %}
         </ul>
     {% else %}

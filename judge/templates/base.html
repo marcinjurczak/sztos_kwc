@@ -1,22 +1,59 @@
+{% load bootstrap4 %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>{% block title %}{% endblock %}</title>
+    {% bootstrap_css %}
+    <style>
+        body {
+            padding-top: 70px;
+        }
+    </style>
 </head>
 <body>
-{% block nav %}
-    <ul id="nav">
-        <li>{% block nav-home %}<a href="{% url 'judge:index' %}">Home</a>{% endblock %}</li>
-        <li>{% block nav-courses %}<a href="{% url 'judge:courses' %}">Courses</a>{% endblock %}</li>
-        {% if user.is_authenticated %}
-            <li>{% block nav-logout %}<a href="{% url 'logout' %}">Logout</a>{% endblock %}</li>
-        {% else %}
-            <li>{% block nav-login %}<a href="{% url 'login' %}">Login</a>{% endblock %}</li>
-        {% endif %}
-    </ul>
-{% endblock %}
-{% block content %}
-{% endblock %}
+<nav class="navbar navbar-expand-sm navbar-dark fixed-top bg-dark">
+    <div class="container">
+
+        <a class="navbar-brand" href="{% url 'judge:index' %}">SZTOS</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="{% url 'judge:index' %}">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'judge:courses' %}">Courses</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav ml-auto">
+                {% if user.is_authenticated %}
+                    <span class="navbar-text m-1">Logged in as {{ user }}</span>
+                    <li class="nav-item">
+                        <a class="btn btn-outline-danger m-1" href="{% url 'logout' %}" type="button">Logout</a>
+                        {% else %}
+                    <li class="nav-item">
+                        <a class="btn btn-outline-primary m-1" href=#>Register</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-outline-success m-1" href="{% url 'login' %}">Login</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+
+    </div>
+</nav>
+
+<div class="container">
+    {% block content %}
+    {% endblock %}
+</div>
+{% bootstrap_javascript %}
 </body>
 </html>
