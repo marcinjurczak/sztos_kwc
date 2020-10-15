@@ -38,7 +38,7 @@
                         <a class="btn btn-outline-danger m-1" href="{% url 'logout' %}" type="button">Logout</a>
                         {% else %}
                     <li class="nav-item">
-                        <a class="btn btn-outline-primary m-1" href=#>Register</a>
+                        <a class="btn btn-outline-primary m-1" href={% url 'signup' %}>Register</a>
                     </li>
                     <li class="nav-item">
                         <a class="btn btn-outline-success m-1" href="{% url 'login' %}">Login</a>

@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+    <div class="d-flex justify-content-left" id="login">
+        <form class="form form-horizontal" method="post">
+            <h1 class="h3 mb-3 font-weight-normal">Login</h1>
+            {% csrf_token %}
+            {% bootstrap_form form %}
+            <button class="btn btn-success btn-bg" type="submit">Login</button>
+            <a href="{% url 'signup' %}">or sign up</a>
+        </form>
+    </div>
+{% endblock %}
