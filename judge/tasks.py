@@ -35,7 +35,7 @@ def validate(solution: Solution) -> None:
 
     # call gcc
     log.debug("Compiling")
-    stdout, _stderr, return_code = bwrap_execute(
+    stdout, stderr, return_code = bwrap_execute(
         ["g++", *sources.keys(), "-o", "/app/build/a.out"],
         cwd="/app",
         ro_binds=[("/lib", "/lib"), ("/lib64", "/lib64"), ("/usr", "/usr"), ("/bin", "/bin")],
@@ -45,6 +45,7 @@ def validate(solution: Solution) -> None:
     if return_code != 0:
         log.info(f"Compilation failed. GCC exited with error code {return_code}.")
         log.info(f"stdout: {stdout.decode('utf-8')}")
+        log.info(f"stderr: {stderr.decode('utf-8')}")
         solution.state = Solution.State.COMPILATION_FAILED
         solution.save()
     else:
