@@ -3,6 +3,7 @@ from pathlib import Path
 from subprocess import Popen, PIPE
 from tempfile import TemporaryDirectory
 from typing import Tuple, List, Optional
+from dataclasses import dataclass, field
 
 from celery import shared_task
 from celery.utils.log import get_task_logger
@@ -35,13 +36,14 @@ def validate(solution: Solution) -> None:
 
     # call gcc
     log.debug("Compiling")
-    stdout, stderr, return_code = bwrap_execute(
+    stdout, stderr, return_code = Task(
         ["g++", *sources.keys(), "-o", "/app/build/a.out"],
         cwd="/app",
         ro_binds=[("/lib", "/lib"), ("/lib64", "/lib64"), ("/usr", "/usr"), ("/bin", "/bin")],
         binds=[(tmp_dir.name, "/app")],
         unshare_all=True,
-    )
+    ).execute()
+
     if return_code != 0:
         log.info(f"Compilation failed. GCC exited with error code {return_code}.")
         log.info(f"stdout: {stdout.decode('utf-8')}")
@@ -61,13 +63,13 @@ def validate(solution: Solution) -> None:
         for test_run in solution.test_runs.all():
             test_case = test_run.test_case
             log.debug("Running")
-            stdout, stderr, return_code = bwrap_execute(
+            stdout, stderr, return_code = Task(
                 ["build/a.out"],
                 stdin=test_case.input.encode("utf-8"),
                 cwd="/app",
                 ro_binds=[("/lib", "/lib"), ("/lib64", "/lib64"), ("/usr", "/usr"), (tmp_dir.name, "/app")],
                 unshare_all=True,
-            )
+            ).execute()
 
             test_run.stdout = stdout.decode("utf-8")
             test_run.stderr = stderr.decode("utf-8")
@@ -89,33 +91,32 @@ def validate(solution: Solution) -> None:
     tmp_dir.cleanup()
 
 
-def bwrap_execute(
-        argv: List[str],
-        stdin: bytes = b"",
-        cwd: Optional[str] = None,
-        ro_binds: List[Tuple[str, str]] = None,
-        binds: List[Tuple[str, str]] = None,
-        unshare_all=False,
-) -> Tuple[bytes, bytes, int]:
-    ro_binds = ro_binds if ro_binds else []
-    binds = binds if binds else []
+@dataclass
+class Task:
+    argv: List[str]
+    stdin: bytes = b""
+    cwd: Optional[str] = None
+    ro_binds: List[Tuple[str, str]] = field(default_factory=list)
+    binds: List[Tuple[str, str]] = field(default_factory=list)
+    unshare_all: bool = False
 
-    flags = ["--die-with-parent"]
-    for src, dst in ro_binds:
-        flags += ["--ro-bind", src, dst]
+    def execute(self) -> Tuple[bytes, bytes, int]:
+        flags = ["--die-with-parent"]
+        for src, dst in self.ro_binds:
+            flags += ["--ro-bind", src, dst]
 
-    for src, dst in binds:
-        flags += ["--bind", src, dst]
+        for src, dst in self.binds:
+            flags += ["--bind", src, dst]
 
-    if unshare_all:
-        flags.append("--unshare-all")
+        if self.unshare_all:
+            flags.append("--unshare-all")
 
-    if cwd:
-        flags += ["--chdir", cwd]
+        if self.cwd:
+            flags += ["--chdir", self.cwd]
 
-    args = ["/usr/bin/bwrap", *flags, *argv]
-    print(args)
-    child = Popen(args, stdin=PIPE, stdout=PIPE, stderr=PIPE)
-    stdout, stderr = child.communicate(input=stdin)
+        args = ["/usr/bin/bwrap", *flags, *self.argv]
+        print(args)
+        child = Popen(args, stdin=PIPE, stdout=PIPE, stderr=PIPE)
+        stdout, stderr = child.communicate(input=self.stdin)
 
-    return stdout, stderr, child.returncode
+        return stdout, stderr, child.returncode
