@@ -75,7 +75,7 @@ class ProblemCreate(generic.CreateView):
 
     def get_success_url(self):
         course = get_object_or_404(Course, id=self.kwargs.get('pk'))
-        return reverse('judge:courses', args=course.id)
+        return reverse('judge:problems', args=[course.id])
 
 
 class ProblemDetailView(FormMixin, generic.DetailView):
