@@ -1,12 +1,10 @@
-from django.contrib.auth.forms import UserCreationForm
 from django.http import HttpResponseRedirect, HttpResponseBadRequest, HttpResponse
-from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse, reverse_lazy
+from django.shortcuts import get_object_or_404
+from django.urls import reverse
 from django.views import generic
 from django.views.decorators.http import require_POST
 from django.views.generic import TemplateView
 from django.views.generic.edit import FormMixin
-from django.contrib import messages
 
 from .forms import SendSolutionForm
 from .models import Course, Problem, Solution, TestRun
@@ -70,6 +68,3 @@ def send_solution(request, problem_id) -> HttpResponse:
     solution.save()
     validate_solution.delay(solution.id)
     return HttpResponseRedirect(reverse('judge:detail', args=(problem.id,)))
-
-
-
