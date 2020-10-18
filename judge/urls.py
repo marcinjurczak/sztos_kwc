@@ -10,5 +10,6 @@ urlpatterns = [
     path('course/<int:pk>/problems/', views.ProblemListView.as_view(), name='problems'),
     path('course/<int:pk>/problem/add/', views.ProblemCreate.as_view(), name='add_problem'),
     path('course/<int:course_pk>/problem/<int:problem_pk>/', views.ProblemDetailView.as_view(), name='detail'),
+    path('course/<int:course_pk>/problem/<int:problem_pk>/test/add', views.TestCaseCreate.as_view(), name='add_test_case'),
     path('<int:problem_id>/send/', views.send_solution, name='send'),
 ]

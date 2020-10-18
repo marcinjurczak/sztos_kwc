@@ -1,17 +1,15 @@
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect, HttpResponseBadRequest, HttpResponse
-from django.shortcuts import get_object_or_404, redirect, render, get_list_or_404
-from django.urls import reverse, reverse_lazy
+from django.shortcuts import get_object_or_404
+from django.urls import reverse
 from django.utils import timezone
 from django.views import generic
 from django.views.decorators.http import require_POST
 from django.views.generic import TemplateView
 from django.views.generic.edit import FormMixin
-from django.contrib import messages
 
 from .forms import SendSolutionForm
-from .models import Course, Problem, Solution, TestRun
+from .models import Course, Problem, Solution, TestRun, TestCase
 from .tasks import validate_solution
 
 
@@ -92,6 +90,8 @@ class ProblemDetailView(FormMixin, generic.DetailView):
         ).last()
         context['user'] = self.request.user
         context["solution"] = solution
+        context['course_pk'] = solution.problem.course.id
+        context['problem_pk'] = solution.problem.id
         if solution:
             if solution.test_runs.count() > 0:
                 context["grade"] = solution.test_runs.filter(
@@ -99,6 +99,26 @@ class ProblemDetailView(FormMixin, generic.DetailView):
             else:
                 context["grade"] = 0
         return context
+
+
+class TestCaseCreate(generic.CreateView):
+    template_name = 'judge/add_test_case.html'
+    model = TestCase
+    fields = ['problem', 'input', 'expected_output']
+
+    def form_valid(self, form):
+        obj = form.save(commit=False)
+        obj.save()
+        return super(TestCaseCreate, self).form_valid(form)
+
+    def get_initial(self):
+        problem = get_object_or_404(Problem, id=self.kwargs.get('problem_pk'))
+        return {'problem': problem}
+
+    def get_success_url(self):
+        course = get_object_or_404(Course, id=self.kwargs.get('course_pk'))
+        problem = get_object_or_404(Problem, id=self.kwargs.get('problem_pk'))
+        return reverse('judge:detail', args=[course.id, problem.id])
 
 
 @require_POST
@@ -115,4 +135,4 @@ def send_solution(request, problem_id) -> HttpResponse:
 
     solution.save()
     validate_solution.delay(solution.id)
-    return HttpResponseRedirect(reverse('judge:detail', args=(problem.id,)))
+    return HttpResponseRedirect(reverse('judge:detail', args=(problem.course.id, problem.id,)))
