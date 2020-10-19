@@ -1,11 +1,8 @@
-from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect, HttpResponseBadRequest, HttpResponse
 from django.shortcuts import get_object_or_404
-from django.urls import reverse
-from django.utils import timezone
+from django.urls import reverse, reverse_lazy
 from django.views import generic
 from django.views.decorators.http import require_POST
-from django.views.generic import TemplateView
 from django.views.generic.edit import FormMixin
 
 from .forms import SendSolutionForm
@@ -13,7 +10,7 @@ from .models import Course, Problem, Solution, TestRun, TestCase
 from .tasks import validate_solution
 
 
-class IndexView(TemplateView):
+class IndexView(generic.TemplateView):
     template_name = 'judge/index.html'
 
 
@@ -29,7 +26,7 @@ class CourseCreate(generic.CreateView):
     template_name = 'judge/add_course.html'
     model = Course
     fields = ['name']
-    success_url = '/courses/'
+    success_url = reverse_lazy('judge:courses')
 
     def form_valid(self, form):
         obj = form.save(commit=True)
