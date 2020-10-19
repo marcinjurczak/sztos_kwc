@@ -35,11 +35,7 @@ class CourseCreate(generic.CreateView):
         obj = form.save(commit=True)
         obj.assigned_users.add(self.request.user)
         obj.save()
-        return super(CourseCreate, self).form_valid(form)
-
-    def get_initial(self):
-        user = get_object_or_404(User, id=self.request.user.id)
-        return {'assigned_users': user}
+        return super().form_valid(form)
 
 
 class ProblemListView(generic.ListView):
@@ -50,7 +46,7 @@ class ProblemListView(generic.ListView):
         return Problem.objects.filter(course__id=self.kwargs.get('pk'))
 
     def get_context_data(self, *, object_list=None, **kwargs):
-        context = super().get_context_data(object_list=object_list, **kwargs)
+        context = super().get_context_data()
         context['pk'] = self.kwargs.get('pk')
         context['course'] = Course.objects.get(id=self.kwargs.get('pk'))
         return context
@@ -60,12 +56,6 @@ class ProblemCreate(generic.CreateView):
     template_name = 'judge/add_problem.html'
     model = Problem
     fields = ['course', 'title', 'description']
-
-    def form_valid(self, form):
-        obj = form.save(commit=False)
-        obj.pub_date = timezone.now()
-        obj.save()
-        return super(ProblemCreate, self).form_valid(form)
 
     def get_initial(self):
         course = get_object_or_404(Course, id=self.kwargs.get('pk'))
@@ -88,10 +78,11 @@ class ProblemDetailView(FormMixin, generic.DetailView):
             user__id=self.request.user.id,
             problem__pk=self.kwargs.get('problem_pk')
         ).last()
+        problem = Problem.objects.get(pk=self.kwargs.get('problem_pk'))
         context['user'] = self.request.user
+        context['problem_pk'] = problem.id
+        context['course_pk'] = problem.course.id
         context["solution"] = solution
-        context['course_pk'] = solution.problem.course.id
-        context['problem_pk'] = solution.problem.id
         if solution:
             if solution.test_runs.count() > 0:
                 context["grade"] = solution.test_runs.filter(
@@ -105,11 +96,6 @@ class TestCaseCreate(generic.CreateView):
     template_name = 'judge/add_test_case.html'
     model = TestCase
     fields = ['problem', 'input', 'expected_output']
-
-    def form_valid(self, form):
-        obj = form.save(commit=False)
-        obj.save()
-        return super(TestCaseCreate, self).form_valid(form)
 
     def get_initial(self):
         problem = get_object_or_404(Problem, id=self.kwargs.get('problem_pk'))
