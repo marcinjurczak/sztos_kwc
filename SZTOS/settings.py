@@ -36,7 +36,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'accounts',
+    'accounts.apps.AccountsConfig',
     "bootstrap4",
 ]
 
@@ -55,7 +55,7 @@ ROOT_URLCONF = 'SZTOS.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')]
+        'DIRS': [os.path.join(BASE_DIR, 'judge/templates'), os.path.join(BASE_DIR, 'accounts/templates')]
         ,
         'APP_DIRS': True,
         'OPTIONS': {

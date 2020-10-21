@@ -3,11 +3,13 @@
 {% block title %}Problems{% endblock %}
 
 {% block content %}
+    <h1 class="h3 mb-3 font-weight-normal">{{ course }}</h1>
+    <a class="btn btn-success m-1" href="{% url 'judge:add_problem' pk %}" type="button">Add problem</a>
     {% if latest_problem_list %}
         <ul class="list-group">
             {% for problem in latest_problem_list %}
                 <a class="list-group-item list-group-item-action"
-                   href="{% url 'judge:detail' problem.id %}">{{ problem.title }}</a>
+                   href="{% url 'judge:detail' problem.course.id problem.id %}">{{ problem.title }}</a>
             {% endfor %}
         </ul>
     {% else %}
