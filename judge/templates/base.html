@@ -7,14 +7,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>{% block title %}{% endblock %}</title>
     {% bootstrap_css %}
-    <style>
-        body {
-            padding-top: 70px;
-        }
-    </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-sm navbar-dark fixed-top bg-dark">
+<nav class="navbar navbar-expand-sm navbar-dark bg-dark mb-3">
     <div class="container">
 
         <a class="navbar-brand" href="{% url 'judge:index' %}">SZTOS</a>
@@ -38,7 +33,7 @@
                         <a class="btn btn-outline-danger m-1" href="{% url 'logout' %}" type="button">Logout</a>
                         {% else %}
                     <li class="nav-item">
-                        <a class="btn btn-outline-primary m-1" href=#>Register</a>
+                        <a class="btn btn-outline-primary m-1" href={% url 'signup' %}>Register</a>
                     </li>
                     <li class="nav-item">
                         <a class="btn btn-outline-success m-1" href="{% url 'login' %}">Login</a>
@@ -54,6 +49,7 @@
     {% block content %}
     {% endblock %}
 </div>
+{% bootstrap_jquery %}
 {% bootstrap_javascript %}
 </body>
 </html>

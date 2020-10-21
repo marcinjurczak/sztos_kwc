@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load bootstrap4 %}
 {% load filters %}
 
 {% block title %}Detail{% endblock %}
@@ -6,18 +7,18 @@
     {% if user.is_authenticated %}
         <h1>{{ problem.title }}</h1>
         <h2>{{ problem.description }}</h2>
+        <a class="btn btn-success m-1" href="{% url 'judge:add_test_case' course_pk problem_pk %}" type="button">
+            Add test case</a>
 
         {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-
-        <form class="md-form" action="{% url 'judge:send' problem.id %}" method="POST" enctype="multipart/form-data">
-            <div class="file-field">
-                <div>
-                    {% csrf_token %}
-                    {{ form }}
-                    <input type="submit" value="Send">
-                </div>
-            </div>
-        </form>
+        <div class="d-flex justify-content-left" id="send">
+            <form class="form form-vertical" action="{% url 'judge:send' problem.id %}" method="POST"
+                  enctype="multipart/form-data">
+                {% csrf_token %}
+                {% bootstrap_form form %}
+                <input class="btn btn-secondary btn-bg" type="submit" value="Send">
+            </form>
+        </div>
         {% if solution %}
             <h2>Status: {{ solution.get_state_display }}</h2>
             {% if solution.test_runs.count > 0 %}
@@ -37,7 +38,7 @@
             {% endif %}
             {% for name, source in solution.get_sources.items %}
                 <h5>{{ name }}</h5>
-                <pre>{{ source }}</pre>
+                <pre><code>{{ source }}</code></pre>
             {% endfor %}
             <label for="solution{{ solution.id }}">Added {{ solution.pub_date }}</label><br>
         {% endif %}

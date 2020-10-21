@@ -3,6 +3,8 @@
 {% block title %}Courses{% endblock %}
 
 {% block content %}
+    <h1 class="h3 mb-3 font-weight-normal">Courses</h1>
+    <a class="btn btn-success m-1" href="{% url 'judge:add_course' %}" type="button">Add course</a>
     {% if course_list %}
         <ul class="list-group">
             {% for course in course_list %}
