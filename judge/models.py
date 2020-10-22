@@ -42,6 +42,7 @@ class TestCase(models.Model):
     input = models.TextField(blank=True)
     expected_output = models.TextField()
     points = models.FloatField(default=1, validators=(MinValueValidator(0),))
+    memory_limit = models.IntegerField(null=True, blank=True, default=50 * 1024 * 1024)
 
 
 class Solution(models.Model):

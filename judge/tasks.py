@@ -10,6 +10,8 @@ from celery.utils.log import get_task_logger
 
 from .models import Solution, TestRun
 
+DEFAULT_MEMORY_LIMIT = 1024 * 1024 * 1024  # 1 GB
+
 
 @shared_task()
 def validate_solution(id: int):
@@ -69,6 +71,7 @@ def validate(solution: Solution) -> None:
                 cwd="/app",
                 ro_binds=[("/lib", "/lib"), ("/lib64", "/lib64"), ("/usr", "/usr"), (tmp_dir.name, "/app")],
                 unshare_all=True,
+                memory_limit=test_case.memory_limit or DEFAULT_MEMORY_LIMIT
             ).execute()
 
             test_run.stdout = stdout.decode("utf-8")
@@ -99,6 +102,7 @@ class Task:
     ro_binds: List[Tuple[str, str]] = field(default_factory=list)
     binds: List[Tuple[str, str]] = field(default_factory=list)
     unshare_all: bool = False
+    memory_limit: Optional[int] = None
 
     def execute(self) -> Tuple[bytes, bytes, int]:
         flags = ["--die-with-parent"]
@@ -115,6 +119,9 @@ class Task:
             flags += ["--chdir", self.cwd]
 
         args = ["/usr/bin/bwrap", *flags, *self.argv]
+        if self.memory_limit:
+            args = ["/usr/bin/setrlimit", f"{self.memory_limit}"] + args
+
         print(args)
         child = Popen(args, stdin=PIPE, stdout=PIPE, stderr=PIPE)
         stdout, stderr = child.communicate(input=self.stdin)
