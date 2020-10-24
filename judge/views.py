@@ -131,7 +131,12 @@ def send_solution(request, problem_id) -> HttpResponse:
 
 @require_GET
 def download_solution(request, course_pk, problem_pk, solution_pk):
-    solution = get_object_or_404(Solution, pk=solution_pk, problem__pk=problem_pk, problem__course__pk=course_pk)
+    solution = get_object_or_404(
+        Solution,
+        pk=solution_pk,
+        problem__pk=problem_pk,
+        problem__course__pk=course_pk
+    )
 
     data = BytesIO()
     with ZipFile(data, "w", ZIP_DEFLATED) as archive:
