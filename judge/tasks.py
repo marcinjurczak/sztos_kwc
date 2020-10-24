@@ -137,7 +137,7 @@ class Task:
         if self.memory_limit:
             args = ["/usr/bin/setrlimit", f"{self.memory_limit}"] + args
 
-        print(args)
+        print(f"Executing command: {args}")
         child = Popen(args, stdin=PIPE, stdout=PIPE, stderr=PIPE)
         start_time = datetime.now()
         try:
