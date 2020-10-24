@@ -1,8 +1,11 @@
+from io import BytesIO
+from zipfile import ZipFile, ZIP_DEFLATED
+
 from django.http import HttpResponseRedirect, HttpResponseBadRequest, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.views import generic
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST, require_GET
 from django.views.generic.edit import FormMixin
 
 from .forms import SendSolutionForm
@@ -124,3 +127,16 @@ def send_solution(request, problem_id) -> HttpResponse:
     solution.save()
     validate_solution.delay(solution.id)
     return HttpResponseRedirect(reverse('judge:detail', args=(problem.course.id, problem.id,)))
+
+
+@require_GET
+def download_solution(request, course_pk, problem_pk, solution_pk):
+    solution = get_object_or_404(Solution, pk=solution_pk, problem__pk=problem_pk, problem__course__pk=course_pk)
+
+    data = BytesIO()
+    with ZipFile(data, "w", ZIP_DEFLATED) as archive:
+        sources = solution.get_sources().items()
+        for path, content in sources:
+            archive.writestr(path, content)
+
+    return HttpResponse(data.getvalue(), content_type="application/zip")
