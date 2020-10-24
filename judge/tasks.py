@@ -1,3 +1,4 @@
+from datetime import timedelta
 from logging import Logger
 from pathlib import Path
 from subprocess import Popen, PIPE
@@ -38,7 +39,7 @@ def validate(solution: Solution) -> None:
 
     # call gcc
     log.debug("Compiling")
-    stdout, stderr, return_code = Task(
+    result = Task(
         ["g++", *sources.keys(), "-o", "/app/build/a.out"],
         cwd="/app",
         ro_binds=[("/lib", "/lib"), ("/lib64", "/lib64"), ("/usr", "/usr"), ("/bin", "/bin")],
@@ -46,10 +47,10 @@ def validate(solution: Solution) -> None:
         unshare_all=True,
     ).execute()
 
-    if return_code != 0:
-        log.info(f"Compilation failed. GCC exited with error code {return_code}.")
-        log.info(f"stdout: {stdout.decode('utf-8')}")
-        log.info(f"stderr: {stderr.decode('utf-8')}")
+    if result.return_code != 0:
+        log.info(f"Compilation failed. GCC exited with error code {result.return_code}.")
+        log.info(f"stdout: {result.stdout.decode('utf-8')}")
+        log.info(f"stderr: {result.stderr.decode('utf-8')}")
         solution.state = Solution.State.COMPILATION_FAILED
         solution.save()
     else:
@@ -65,7 +66,7 @@ def validate(solution: Solution) -> None:
         for test_run in solution.test_runs.all():
             test_case = test_run.test_case
             log.debug("Running")
-            stdout, stderr, return_code = Task(
+            result = Task(
                 ["build/a.out"],
                 stdin=test_case.input.encode("utf-8"),
                 cwd="/app",
@@ -74,13 +75,13 @@ def validate(solution: Solution) -> None:
                 memory_limit=test_case.memory_limit or DEFAULT_MEMORY_LIMIT
             ).execute()
 
-            test_run.stdout = stdout.decode("utf-8")
-            test_run.stderr = stderr.decode("utf-8")
-            test_run.return_code = return_code
+            test_run.stdout = result.stdout.decode("utf-8")
+            test_run.stderr = result.stderr.decode("utf-8")
+            test_run.return_code = result.return_code
 
-            if return_code != 0:
-                log.info(f"Program exited with error code {return_code}.")
-                log.info(f"stdout: {stdout}")
+            if result.return_code != 0:
+                log.info(f"Program exited with error code {result.return_code}.")
+                log.info(f"stdout: {result.stdout}")
                 test_run.state = TestRun.State.CRASHED
             else:
                 log.debug("Validating")
@@ -95,6 +96,15 @@ def validate(solution: Solution) -> None:
 
 
 @dataclass
+class TaskResult:
+    stdout: bytes
+    stderr: bytes
+    return_code: int
+    time: timedelta
+    timed_out: bool
+
+
+@dataclass
 class Task:
     argv: List[str]
     stdin: bytes = b""
@@ -104,7 +114,7 @@ class Task:
     unshare_all: bool = False
     memory_limit: Optional[int] = None
 
-    def execute(self) -> Tuple[bytes, bytes, int]:
+    def execute(self) -> TaskResult:
         flags = ["--die-with-parent"]
         for src, dst in self.ro_binds:
             flags += ["--ro-bind", src, dst]
@@ -126,4 +136,10 @@ class Task:
         child = Popen(args, stdin=PIPE, stdout=PIPE, stderr=PIPE)
         stdout, stderr = child.communicate(input=self.stdin)
 
-        return stdout, stderr, child.returncode
+        return TaskResult(
+            stdout=stdout,
+            stderr=stderr,
+            return_code=child.returncode,
+            time=timedelta(0),
+            timed_out=False,
+        )
