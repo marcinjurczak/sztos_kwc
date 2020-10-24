@@ -1,7 +1,7 @@
-from datetime import timedelta
+from datetime import timedelta, datetime
 from logging import Logger
 from pathlib import Path
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, TimeoutExpired
 from tempfile import TemporaryDirectory
 from typing import Tuple, List, Optional
 from dataclasses import dataclass, field
@@ -72,14 +72,18 @@ def validate(solution: Solution) -> None:
                 cwd="/app",
                 ro_binds=[("/lib", "/lib"), ("/lib64", "/lib64"), ("/usr", "/usr"), (tmp_dir.name, "/app")],
                 unshare_all=True,
-                memory_limit=test_case.memory_limit or DEFAULT_MEMORY_LIMIT
+                memory_limit=test_case.memory_limit or DEFAULT_MEMORY_LIMIT,
+                time_limit=test_case.time_limit
             ).execute()
 
             test_run.stdout = result.stdout.decode("utf-8")
             test_run.stderr = result.stderr.decode("utf-8")
             test_run.return_code = result.return_code
+            test_run.time = result.time.total_seconds()
 
-            if result.return_code != 0:
+            if result.timed_out:
+                test_run.state = TestRun.State.TIMED_OUT
+            elif result.return_code != 0:
                 log.info(f"Program exited with error code {result.return_code}.")
                 log.info(f"stdout: {result.stdout}")
                 test_run.state = TestRun.State.CRASHED
@@ -113,6 +117,7 @@ class Task:
     binds: List[Tuple[str, str]] = field(default_factory=list)
     unshare_all: bool = False
     memory_limit: Optional[int] = None
+    time_limit: Optional[float] = None
 
     def execute(self) -> TaskResult:
         flags = ["--die-with-parent"]
@@ -134,12 +139,21 @@ class Task:
 
         print(args)
         child = Popen(args, stdin=PIPE, stdout=PIPE, stderr=PIPE)
-        stdout, stderr = child.communicate(input=self.stdin)
+        start_time = datetime.now()
+        try:
+            stdout, stderr = child.communicate(input=self.stdin, timeout=self.time_limit)
+            timed_out = False
+        except TimeoutExpired:
+            timed_out = True
+            stdout = b""
+            stderr = b""
+
+        time = datetime.now() - start_time
 
         return TaskResult(
             stdout=stdout,
             stderr=stderr,
             return_code=child.returncode,
-            time=timedelta(0),
-            timed_out=False,
+            time=time,
+            timed_out=timed_out,
         )
