@@ -28,7 +28,7 @@ int main(int argc, char **argv) {
 
   limit.rlim_cur = requested_limit;
   if (setrlimit(LIMIT, &limit) != 0) {
-    perror("setrlimit failed")
+    perror("setrlimit failed");
     return 1;
   }
 
