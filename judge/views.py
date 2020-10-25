@@ -81,11 +81,8 @@ class ProblemDetailView(FormMixin, generic.DetailView):
         context['course_pk'] = problem.course.id
         context["solution"] = solution
         if solution:
-            if solution.test_runs.count() > 0:
-                context["grade"] = solution.test_runs.filter(
-                    state=TestRun.State.VALID).count() / solution.test_runs.count()
-            else:
-                context["grade"] = 0
+            context["grade"] = solution.get_grade()
+
         return context
 
 

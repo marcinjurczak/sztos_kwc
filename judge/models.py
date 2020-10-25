@@ -52,6 +52,13 @@ class Solution(models.Model):
     def get_sources(self) -> Dict[str, str]:
         return get_directory(settings.S3_SUBMISSION_BUCKET, f"{self.uuid}/files/")
 
+    def get_grade(self) -> float:
+        if self.test_runs.count() == 0:
+            return 0
+
+        valid_runs = self.test_runs.filter(state=TestRun.State.VALID).count()
+        return valid_runs / self.test_runs.count()
+
     def __str__(self):
         return f"Solution({self.id})"
 
