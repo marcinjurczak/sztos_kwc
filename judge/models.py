@@ -6,7 +6,7 @@ from django.core.files import File
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.contrib.auth.models import User
-from django.db.models import Sum, Q
+from django.db.models import Sum, Q, Subquery, Max
 
 from judge.storage import s3, get_directory
 
@@ -27,6 +27,14 @@ class Problem(models.Model):
 
     def __str__(self):
         return self.title
+
+    def get_grades(self) -> Dict[User, Optional[float]]:
+        newest = Subquery(self.solution_set.values("user__pk").annotate(Max("pk")).values("pk__max"))
+        solutions = Solution.objects.filter(pk__in=newest).order_by("user__pk")
+
+        return {
+            solution.user: solution.get_grade() for solution in solutions
+        }
 
 
 class TestCase(models.Model):

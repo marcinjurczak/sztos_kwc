@@ -86,6 +86,14 @@ class ProblemDetailView(FormMixin, generic.DetailView):
         return context
 
 
+class ProblemGradesView(generic.DetailView):
+    model = Problem
+    template_name = "judge/problem_grades.html"
+
+    def get_queryset(self):
+        return super().get_queryset().filter(course__pk=self.kwargs.get("course_pk"))
+
+
 class TestCaseCreate(generic.CreateView):
     template_name = 'judge/add_test_case.html'
     model = TestCase
