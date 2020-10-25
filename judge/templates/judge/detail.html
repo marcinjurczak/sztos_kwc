@@ -22,7 +22,7 @@
         {% if solution %}
             <h2>Status: {{ solution.get_state_display }}</h2>
             {% if solution.test_runs.count > 0 %}
-                <h2>Grade: {{ grade | percentage }}</h2>
+                <h2>Grade: {% if grade is None %}N/A{% else %}{{ grade | percentage }}{% endif %}</h2>
                 <table>
                     <tr>
                         <td>#</td>

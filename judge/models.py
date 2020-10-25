@@ -1,10 +1,12 @@
-from typing import Dict
+from typing import Dict, Optional
 from uuid import uuid4
 
 from django.conf import settings
 from django.core.files import File
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models import Sum, Q, Subquery, Max
 
 from judge.storage import s3, get_directory
 
@@ -26,11 +28,20 @@ class Problem(models.Model):
     def __str__(self):
         return self.title
 
+    def get_grades(self) -> Dict[User, Optional[float]]:
+        newest = Subquery(self.solution_set.values("user__pk").annotate(Max("pk")).values("pk__max"))
+        solutions = Solution.objects.filter(pk__in=newest).order_by("user__pk")
+
+        return {
+            solution.user: solution.get_grade() for solution in solutions
+        }
+
 
 class TestCase(models.Model):
     problem = models.ForeignKey(Problem, on_delete=models.CASCADE, related_name="test_cases")
     input = models.TextField(blank=True)
     expected_output = models.TextField()
+    points = models.FloatField(default=1, validators=(MinValueValidator(0),))
 
 
 class Solution(models.Model):
@@ -51,6 +62,23 @@ class Solution(models.Model):
 
     def get_sources(self) -> Dict[str, str]:
         return get_directory(settings.S3_SUBMISSION_BUCKET, f"{self.uuid}/files/")
+
+    def get_grade(self) -> Optional[float]:
+        if self.test_runs.count() == 0:
+            return None
+
+        aggregated = self.test_runs.all().aggregate(
+            max_points=Sum("test_case__points"),
+            points=Sum("test_case__points", filter=Q(state=TestRun.State.VALID)),
+        )
+
+        if aggregated["max_points"] == 0:
+            return None
+
+        if aggregated["points"] is None:
+            return 0
+
+        return aggregated["points"] / aggregated["max_points"]
 
     def __str__(self):
         return f"Solution({self.id})"
