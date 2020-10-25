@@ -7,6 +7,9 @@ services:
   celery:
     build: .
     command: ["celery", "-A", "SZTOS", "worker", "-l", "info", "--broker", "amqp://rabbitmq"]
+    # privileged is a bit much but I haven't been able to track down which capability (or SELinux setting controls
+    # creating namespaces. This should not be an issue in simple Docker deployments.
+    privileged: true
     volumes:
       - ./db.sqlite3:/app/db.sqlite3
     environment:

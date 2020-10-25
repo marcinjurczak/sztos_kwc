@@ -42,6 +42,8 @@ class TestCase(models.Model):
     input = models.TextField(blank=True)
     expected_output = models.TextField()
     points = models.FloatField(default=1, validators=(MinValueValidator(0),))
+    memory_limit = models.IntegerField(null=True, blank=True, default=50 * 1024 * 1024)
+    time_limit = models.FloatField(validators=(MinValueValidator(0),))
 
 
 class Solution(models.Model):
@@ -98,3 +100,4 @@ class TestRun(models.Model):
     stderr = models.TextField(null=True)
     return_code = models.IntegerField(null=True)
     state = models.IntegerField(choices=State.choices, default=State.PENDING)
+    time = models.FloatField(null=True)
