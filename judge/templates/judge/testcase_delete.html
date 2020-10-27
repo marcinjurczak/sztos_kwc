@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+
+{% block title %}Delete test case{% endblock %}
+
+{% block content %}
+    <div class="d-flex justify-content-left">
+        <div class="card shadow" style="width: 35rem;">
+            <article class="card-body">
+                <form class="form" method="post">
+                    <h1 class="h3 mb-3 font-weight-normal">Delete test case?</h1>
+                    {% csrf_token %}
+                    <p>Are you sure you want to delete this test case? </p>
+                    <button class="btn btn-danger btn-bg" type="submit">Delete</button>
+                </form>
+            </article>
+        </div>
+    </div>
+{% endblock %}

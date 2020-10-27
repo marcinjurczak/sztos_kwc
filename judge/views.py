@@ -26,7 +26,7 @@ class CourseListView(generic.ListView):
 
 
 class CourseCreate(generic.CreateView):
-    template_name = 'judge/add_course.html'
+    template_name = 'judge/course_create.html'
     model = Course
     fields = ['name']
     success_url = reverse_lazy('judge:courses')
@@ -36,6 +36,19 @@ class CourseCreate(generic.CreateView):
         obj.assigned_users.add(self.request.user)
         obj.save()
         return super().form_valid(form)
+
+
+class CourseUpdate(generic.UpdateView):
+    template_name_suffix = '_update'
+    model = Course
+    fields = ['name', 'assigned_users']
+    success_url = reverse_lazy('judge:courses')
+
+
+class CourseDelete(generic.DeleteView):
+    template_name_suffix = '_delete'
+    model = Course
+    success_url = reverse_lazy('judge:courses')
 
 
 class ProblemListView(generic.ListView):
@@ -53,13 +66,34 @@ class ProblemListView(generic.ListView):
 
 
 class ProblemCreate(generic.CreateView):
-    template_name = 'judge/add_problem.html'
+    template_name = 'judge/problem_create.html'
     model = Problem
     fields = ['course', 'title', 'description']
 
     def get_initial(self):
         course = get_object_or_404(Course, id=self.kwargs.get('pk'))
         return {'course': course}
+
+    def get_success_url(self):
+        course = get_object_or_404(Course, id=self.kwargs.get('pk'))
+        return reverse('judge:problems', args=[course.id])
+
+
+class ProblemUpdate(generic.UpdateView):
+    template_name_suffix = '_update'
+    model = Problem
+    fields = ['course', 'title', 'description']
+    pk_url_kwarg = 'problem_pk'
+
+    def get_success_url(self):
+        course = get_object_or_404(Course, id=self.kwargs.get('pk'))
+        return reverse('judge:problems', args=[course.id])
+
+
+class ProblemDelete(generic.DeleteView):
+    template_name_suffix = '_delete'
+    model = Problem
+    pk_url_kwarg = 'problem_pk'
 
     def get_success_url(self):
         course = get_object_or_404(Course, id=self.kwargs.get('pk'))
@@ -97,8 +131,22 @@ class ProblemGradesView(generic.DetailView):
         return super().get_queryset().filter(course__pk=self.kwargs.get("course_pk"))
 
 
+class TestCaseView(generic.ListView):
+    template_name = "judge/testcases.html"
+    context_object_name = 'test_cases_list'
+
+    def get_queryset(self):
+        return TestCase.objects.filter(problem__id=self.kwargs.get('problem_pk'))
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data()
+        context['pk'] = self.kwargs.get('pk')
+        context['problem'] = Problem.objects.get(id=self.kwargs.get('problem_pk'))
+        return context
+
+
 class TestCaseCreate(generic.CreateView):
-    template_name = 'judge/add_test_case.html'
+    template_name = 'judge/testcase_create.html'
     model = TestCase
     fields = ['problem', 'input', 'expected_output']
 
@@ -110,6 +158,30 @@ class TestCaseCreate(generic.CreateView):
         course = get_object_or_404(Course, id=self.kwargs.get('course_pk'))
         problem = get_object_or_404(Problem, id=self.kwargs.get('problem_pk'))
         return reverse('judge:detail', args=[course.id, problem.id])
+
+
+class TestCaseUpdate(generic.UpdateView):
+    template_name_suffix = '_update'
+    model = TestCase
+    fields = ['input', 'expected_output',
+              'points', 'memory_limit', 'time_limit']
+    pk_url_kwarg = 'test_case_pk'
+
+    def get_success_url(self):
+        course = get_object_or_404(Course, id=self.kwargs.get('course_pk'))
+        problem = get_object_or_404(Problem, id=self.kwargs.get('problem_pk'))
+        return reverse('judge:test_cases', args=[course.id, problem.id])
+
+
+class TestCaseDelete(generic.DeleteView):
+    template_name_suffix = '_delete'
+    model = TestCase
+    pk_url_kwarg = 'test_case_pk'
+
+    def get_success_url(self):
+        course = get_object_or_404(Course, id=self.kwargs.get('course_pk'))
+        problem = get_object_or_404(Problem, id=self.kwargs.get('problem_pk'))
+        return reverse('judge:test_cases', args=[course.id, problem.id])
 
 
 @require_POST
