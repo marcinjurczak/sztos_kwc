@@ -20,7 +20,6 @@
             </form>
         </div>
         {% if solution %}
-            <a href="{% url "judge:download_solution" course_pk problem_pk solution.pk %}">Download</a>
             <h2>Status: {{ solution.get_state_display }}</h2>
             {% if solution.test_runs.count > 0 %}
                 <h2>Grade: {% if grade is None %}N/A{% else %}{{ grade | percentage }}{% endif %}</h2>
@@ -42,6 +41,7 @@
                 <pre><code>{{ source }}</code></pre>
             {% endfor %}
             <label for="solution{{ solution.id }}">Added {{ solution.pub_date }}</label><br>
+            <a class="btn btn-primary" href="{% url "judge:download_solution" course_pk problem_pk solution.pk %}">Download</a>
         {% endif %}
     {% else %}
         <p>You have to be logged in to view this page</p>
