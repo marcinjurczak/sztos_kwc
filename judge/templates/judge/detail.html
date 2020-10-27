@@ -4,47 +4,52 @@
 
 {% block title %}Detail{% endblock %}
 {% block content %}
-    {% if user.is_authenticated %}
+    {% if perms.judge.view_problem %}
         <h1>{{ problem.title }}</h1>
         <h2>{{ problem.description }}</h2>
-        <a class="btn btn-success my-1" href="{% url 'judge:test_cases' course_pk problem_pk %}" type="button">
-            View test cases</a>
-
+        {% if perms.judge.view_testcase %}
+            <a class="btn btn-success my-1" href="{% url 'judge:test_cases' course_pk problem_pk %}" type="button">
+                View test cases</a>
+        {% endif %}
         {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-        <div class="d-flex justify-content-left" id="send">
-            <form class="form form-vertical" action="{% url 'judge:send' problem.id %}" method="POST"
-                  enctype="multipart/form-data">
-                {% csrf_token %}
-                {% bootstrap_form form %}
-                <input class="btn btn-secondary btn-bg" type="submit" value="Send">
-            </form>
-        </div>
-        {% if solution %}
-            <a href="{% url "judge:download_solution" course_pk problem_pk solution.pk %}">Download</a>
-            <h2>Status: {{ solution.get_state_display }}</h2>
-            {% if solution.test_runs.count > 0 %}
-                <h2>Grade: {% if grade is None %}N/A{% else %}{{ grade | percentage }}{% endif %}</h2>
-                <table>
-                    <tr>
-                        <td>#</td>
-                        <td>State</td>
-                    </tr>
-                    {% for test_run in solution.test_runs.all %}
+        {% if perms.judge.add_solution %}
+            <div class="d-flex justify-content-left" id="send">
+                <form class="form form-vertical" action="{% url 'judge:send' problem.id %}" method="POST"
+                      enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {% bootstrap_form form %}
+                    <input class="btn btn-secondary btn-bg" type="submit" value="Send">
+                </form>
+            </div>
+            {% if solution %}
+                <a href="{% url "judge:download_solution" course_pk problem_pk solution.pk %}">Download</a>
+                <h2>Status: {{ solution.get_state_display }}</h2>
+                {% if solution.test_runs.count > 0 %}
+                    <h2>Grade: {% if grade is None %}N/A{% else %}{{ grade | percentage }}{% endif %}</h2>
+                    <table>
                         <tr>
-                            <td>{{ forloop.counter }}</td>
-                            <td>{{ test_run.get_state_display }}</td>
+                            <td>#</td>
+                            <td>State</td>
                         </tr>
-                    {% endfor %}
-                </table>
+                        {% for test_run in solution.test_runs.all %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ test_run.get_state_display }}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                {% endif %}
+                {% for name, source in solution.get_sources.items %}
+                    <h5>{{ name }}</h5>
+                    <pre><code>{{ source }}</code></pre>
+                {% endfor %}
+                <label for="solution{{ solution.id }}">Added {{ solution.pub_date }}</label><br>
             {% endif %}
-            {% for name, source in solution.get_sources.items %}
-                <h5>{{ name }}</h5>
-                <pre><code>{{ source }}</code></pre>
-            {% endfor %}
-            <label for="solution{{ solution.id }}">Added {{ solution.pub_date }}</label><br>
         {% endif %}
     {% else %}
-        <p>You have to be logged in to view this page</p>
-        <a href="{% url 'login' %}">Click here to login</a>
+        <div class="alert alert-danger" role="alert">
+            <h4 class="alert-heading">Error</h4>
+            <p>You are not authorized to view this page</p>
+        </div>
     {% endif %}
 {% endblock %}

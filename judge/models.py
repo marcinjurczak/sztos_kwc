@@ -36,6 +36,11 @@ class Problem(models.Model):
             solution.user: solution.get_grade() for solution in solutions
         }
 
+    class Meta:
+        permissions = (
+            ("view_grades", "Can view grades"),
+        )
+
 
 class TestCase(models.Model):
     problem = models.ForeignKey(Problem, on_delete=models.CASCADE, related_name="test_cases")

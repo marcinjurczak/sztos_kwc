@@ -3,56 +3,59 @@
 {% block title %}Test cases{% endblock %}
 
 {% block content %}
-    <h1 class="h3 font-weight-normal">{{ problem }}</h1>
-    <a class="btn btn-success my-1" href="{% url 'judge:test_case_create' problem.course.id problem.id %}"
-       type="button">Add test case</a>
-    {% if test_cases_list %}
-        <div class="card shadow">
-            <div class="table-responsive">
-                <table class="table table-bordered m-0">
-                    <thead class="thead-light">
-                    <tr>
-                        <th>Input</th>
-                        <th>Expected output</th>
-                        <th>Points</th>
-                        <th>Memory limit</th>
-                        <th>Time limit</th>
-                        <th>Edit</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for test_case in test_cases_list %}
+    {% if perms.judge.view_testcase %}
+        <h1 class="h3 font-weight-normal">{{ problem }}</h1>
+        {% if perms.judge.add_testcase %}
+            <a class="btn btn-success my-1" href="{% url 'judge:test_case_create' problem.course.id problem.id %}"
+               type="button">Add test case</a>
+        {% endif %}
+        {% if test_cases_list %}
+            <div class="card shadow">
+                <div class="table-responsive">
+                    <table class="table table-bordered m-0">
+                        <thead class="thead-light">
                         <tr>
-                            <td>
-                                {{ test_case.input }}
-                            </td>
-                            <td>
-                                {{ test_case.expected_output }}
-                            </td>
-                            <td>
-                                {{ test_case.points }}
-                            </td>
-                            <td>
-                                {{ test_case.memory_limit }}
-                            </td>
-                            <td>
-                                {{ test_case.time_limit }}
-                            </td>
-                            <td class="w-auto text-center">
-                                <a class="btn btn-success my-1"
-                                   href="{% url 'judge:test_case_update' test_case.problem.course.id test_case.problem.id test_case.id %}"
-                                   type="button">Update</a>
-                                <a class="btn btn-danger my-1"
-                                   href="{% url 'judge:test_case_delete' test_case.problem.course.id test_case.problem.id test_case.id %}"
-                                   type="button">Delete</a>
-                            </td>
+                            <th>Input</th>
+                            <th>Expected output</th>
+                            <th>Points</th>
+                            <th>Memory limit</th>
+                            <th>Time limit</th>
+                            {% if perms.judge.change_testcase and perms.judge.delete_testcase %}
+                                <th>Edit</th>
+                            {% endif %}
                         </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                        {% for test_case in test_cases_list %}
+                            <tr>
+                                <td>{{ test_case.input }}</td>
+                                <td>{{ test_case.expected_output }}</td>
+                                <td>{{ test_case.points }}</td>
+                                <td>{{ test_case.memory_limit }}</td>
+                                <td>{{ test_case.time_limit }}</td>
+                                {% if perms.judge.change_testcase and perms.judge.delete_testcase %}
+                                    <td class="w-auto text-center">
+                                        <a class="btn btn-success my-1"
+                                           href="{% url 'judge:test_case_update' test_case.problem.course.id test_case.problem.id test_case.id %}"
+                                           type="button">Update</a>
+                                        <a class="btn btn-danger my-1"
+                                           href="{% url 'judge:test_case_delete' test_case.problem.course.id test_case.problem.id test_case.id %}"
+                                           type="button">Delete</a>
+                                    </td>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
+        {% else %}
+            <p>No test cases are available.</p>
+        {% endif %}
     {% else %}
-        <p>No test cases are available.</p>
+        <div class="alert alert-danger" role="alert">
+            <h4 class="alert-heading">Error</h4>
+            <p>You are not authorized to view this page</p>
+        </div>
     {% endif %}
 {% endblock %}

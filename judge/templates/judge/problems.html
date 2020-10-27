@@ -3,47 +3,64 @@
 {% block title %}Problems{% endblock %}
 
 {% block content %}
-    <h1 class="h3 font-weight-normal">{{ course }}</h1>
-    <a class="btn btn-success my-1" href="{% url 'judge:problem_create' pk %}" type="button">Add problem</a>
-    {% if latest_problem_list %}
-        <div class="card shadow">
-            <div class="table-responsive">
-                <table class="table table-hover table-bordered m-0">
-                    <thead class="thead-light">
-                    <tr>
-                        <th>Problem</th>
-                        <th>Grades</th>
-                        <th>Edit</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for problem in latest_problem_list %}
+    {% if perms.judge.view_problem %}
+        <h1 class="h3 font-weight-normal">{{ course }}</h1>
+        {% if perms.judge.add_problem %}
+            <a class="btn btn-success my-1" href="{% url 'judge:problem_create' pk %}" type="button">Add problem</a>
+        {% endif %}
+        {% if latest_problem_list %}
+            <div class="card shadow">
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered m-0">
+                        <thead class="thead-light">
                         <tr>
-                            <td class="w-75">
-                                <a class="nav-link text-dark my-1"
-                                   href="{% url 'judge:detail' problem.course.id problem.id %}">
-                                    {{ problem.title }}
-                                </a>
-                            </td>
-                            <td class="w-auto text-center">
-                                <a class="btn btn-primary my-1"
-                                   href="{% url 'judge:problem_grades' problem.course.id problem.id %}">Grades</a>
-                            </td>
-                            <td class="w-25 text-center">
-                                <a class="btn btn-success my-1"
-                                   href="{% url 'judge:problem_update' problem.course.id problem.id %}"
-                                   type="button">Update</a>
-                                <a class="btn btn-danger my-1"
-                                   href="{% url 'judge:problem_delete' problem.course.id problem.id %}"
-                                   type="button">Delete</a>
-                            </td>
+                            <th>Problem</th>
+                            {% if perms.judge.view_grades %}
+                                <th>Grades</th>
+                            {% endif %}
+                            {% if perms.judge.change_problem and perms.judge.delete_problem %}
+                                <th>Edit</th>
+                            {% endif %}
                         </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                        {% for problem in latest_problem_list %}
+                            <tr>
+                                <td class="w-75">
+                                    <a class="nav-link text-dark my-1"
+                                       href="{% url 'judge:detail' problem.course.id problem.id %}">
+                                        {{ problem.title }}
+                                    </a>
+                                </td>
+                                {% if perms.judge.view_grades %}
+                                    <td class="w-auto text-center">
+                                        <a class="btn btn-primary my-1"
+                                           href="{% url 'judge:problem_grades' problem.course.id problem.id %}">Grades</a>
+                                    </td>
+                                {% endif %}
+                                {% if perms.judge.change_problem and perms.judge.delete_problem %}
+                                    <td class="w-25 text-center">
+                                        <a class="btn btn-success my-1"
+                                           href="{% url 'judge:problem_update' problem.course.id problem.id %}"
+                                           type="button">Update</a>
+                                        <a class="btn btn-danger my-1"
+                                           href="{% url 'judge:problem_delete' problem.course.id problem.id %}"
+                                           type="button">Delete</a>
+                                    </td>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
+        {% else %}
+            <p>No problems are available.</p>
+        {% endif %}
     {% else %}
-        <p>No problems are available.</p>
+        <div class="alert alert-danger" role="alert">
+            <h4 class="alert-heading">Error</h4>
+            <p>You are not authorized to view this page</p>
+        </div>
     {% endif %}
 {% endblock %}

@@ -3,9 +3,11 @@
 {% block title %}Courses{% endblock %}
 
 {% block content %}
-    {% if user.is_authenticated %}
+    {% if perms.judge.view_course %}
         <h1 class="h3 font-weight-normal">Courses</h1>
-        <a class="btn btn-success my-1" href="{% url 'judge:course_create' %}" type="button">New course</a>
+        {% if perms.judge.add_course %}
+            <a class="btn btn-success my-1" href="{% url 'judge:course_create' %}" type="button">New course</a>
+        {% endif %}
         {% if course_list %}
             <div class="card shadow">
                 <div class="table-responsive">
@@ -13,7 +15,9 @@
                         <thead class="thead-light">
                         <tr>
                             <th>Course</th>
-                            <th>Edit</th>
+                            {% if perms.judge.change_course and perms.judge.delete_course %}
+                                <th>Edit</th>
+                            {% endif %}
                         </tr>
                         </thead>
                         <tbody>
@@ -23,12 +27,14 @@
                                     <a class="nav-link text-dark my-1"
                                        href="{% url 'judge:problems' course.id %}">{{ course.name }}</a>
                                 </td>
-                                <td class="w-auto text-center">
-                                    <a class="btn btn-success my-1" href="{% url 'judge:course_update' course.id %}"
-                                       type="button">Update</a>
-                                    <a class="btn btn-danger my-1" href="{% url 'judge:course_delete' course.id %}"
-                                       type="button">Delete</a>
-                                </td>
+                                {% if perms.judge.change_course and perms.judge.delete_course %}
+                                    <td class="w-auto text-center">
+                                        <a class="btn btn-success my-1" href="{% url 'judge:course_update' course.id %}"
+                                           type="button">Update</a>
+                                        <a class="btn btn-danger my-1" href="{% url 'judge:course_delete' course.id %}"
+                                           type="button">Delete</a>
+                                    </td>
+                                {% endif %}
                             </tr>
                         {% endfor %}
                         </tbody>
@@ -39,8 +45,10 @@
             <p>No courses are available.</p>
         {% endif %}
     {% else %}
-        <p>You have to be logged in to view this page</p>
-        <a href="{% url 'login' %}">Click here to login</a>
+        <div class="alert alert-danger" role="alert">
+            <h4 class="alert-heading">Error</h4>
+            <p>You are not authorized to view this page</p>
+        </div>
     {% endif %}
 {% endblock %}
 

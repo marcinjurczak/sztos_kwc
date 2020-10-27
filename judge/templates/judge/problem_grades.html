@@ -3,18 +3,25 @@
 
 {% block title %}Grades{% endblock %}
 {% block content %}
-<table class="table">
-<thead>
-<tr>
-    <td>Name</td>
-    <td>Grade</td>
-</tr>
-{% for user, grade in problem.get_grades.items %}
-<tr>
-    <td>{{ user.username }}</td>
-    <td>{{ grade | percentage }}</td>
-</tr>
-{% endfor %}
-</thead>
-</table>
+    {% if perms.judge.view_grades %}
+        <table class="table">
+            <thead>
+            <tr>
+                <td>Name</td>
+                <td>Grade</td>
+            </tr>
+            {% for user, grade in problem.get_grades.items %}
+                <tr>
+                    <td>{{ user.username }}</td>
+                    <td>{{ grade | percentage }}</td>
+                </tr>
+            {% endfor %}
+            </thead>
+        </table>
+    {% else %}
+        <div class="alert alert-danger" role="alert">
+            <h4 class="alert-heading">Error</h4>
+            <p>You are not authorized to view this page</p>
+        </div>
+    {% endif %}
 {% endblock %}

@@ -4,16 +4,23 @@
 {% block title %}Update problem{% endblock %}
 
 {% block content %}
-    <div class="d-flex justify-content-left">
-        <div class="card shadow" style="width: 25rem;">
-            <article class="card-body">
-                <form class="form" method="post">
-                    <h1 class="h3 mb-3 font-weight-normal">Update problem</h1>
-                    {% csrf_token %}
-                    {% bootstrap_form form %}
-                    <button class="btn btn-success btn-bg" type="submit">Update</button>
-                </form>
-            </article>
+    {% if perms.judge.change_problem %}
+        <div class="d-flex justify-content-left">
+            <div class="card shadow" style="width: 25rem;">
+                <article class="card-body">
+                    <form class="form" method="post">
+                        <h1 class="h3 mb-3 font-weight-normal">Update problem</h1>
+                        {% csrf_token %}
+                        {% bootstrap_form form %}
+                        <button class="btn btn-success btn-bg" type="submit">Update</button>
+                    </form>
+                </article>
+            </div>
         </div>
-    </div>
+    {% else %}
+        <div class="alert alert-danger" role="alert">
+            <h4 class="alert-heading">Error</h4>
+            <p>You are not authorized to view this page</p>
+        </div>
+    {% endif %}
 {% endblock %}
