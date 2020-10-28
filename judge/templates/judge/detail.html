@@ -32,6 +32,7 @@
                             <tr>
                                 <td>#</td>
                                 <td>State</td>
+                                <td>Time [s]</td>
                             </tr>
                             </thead>
                             <tbody>
@@ -42,7 +43,8 @@
                                     <tr class="table-danger w-auto">
                                 {% endif %}
                             <td>{{ forloop.counter }}</td>
-                            <td class="w-100">{{ test_run.get_state_display }}</td>
+                            <td class="w-75">{{ test_run.get_state_display }}</td>
+                            <td class="w-25">{{ test_run.time }}</td>
                             </tr>
                             {% endfor %}
                             </tbody>
