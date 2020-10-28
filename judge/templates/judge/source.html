@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% load filters %}
+
+{% block title %}Source{% endblock %}
+{% block content %}
+    <h1>{{ problem.title }}</h1>
+    <h2>{{ problem.description }}</h2>
+    {% if solution %}
+        <a href="{% url "judge:download_solution" course_pk problem_pk solution.pk %}">Download</a>
+        <h2>Status: {{ solution.get_state_display }}</h2>
+        {% for name, source in solution.get_sources.items %}
+            <div class="card shadow">
+                <article class="card-body">
+                    <h5>{{ name }}</h5>
+                    <pre><code>{{ source }}</code></pre>
+                </article>
+            </div>
+        {% endfor %}
+        <label for="solution{{ solution.id }}">Added {{ solution.pub_date }}</label><br>
+    {% endif %}
+{% endblock %}
