@@ -4,12 +4,16 @@
 {% block title %}Add test case{% endblock %}
 
 {% block content %}
-    <div class="d-flex justify-content-left" id="login">
-        <form class="form form-horizontal" method="post">
-            <h1 class="h3 mb-3 font-weight-normal" >Add test case</h1>
-            {% csrf_token %}
-            {% bootstrap_form form %}
-            <button class="btn btn-success btn-bg" type="submit">Add</button>
-        </form>
+    <div class="d-flex justify-content-left">
+        <div class="card shadow" style="width: 40rem;">
+            <article class="card-body">
+                <form class="form" method="post">
+                    <h1 class="h3 mb-3 font-weight-normal">Create test case</h1>
+                    {% csrf_token %}
+                    {% bootstrap_form form %}
+                    <button class="btn btn-success btn-bg" type="submit">Create</button>
+                </form>
+            </article>
+        </div>
     </div>
 {% endblock %}

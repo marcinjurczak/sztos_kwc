@@ -1,6 +1,7 @@
 from io import BytesIO
 from zipfile import ZipFile, ZIP_DEFLATED
 
+from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect, HttpResponseBadRequest, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
@@ -28,8 +29,12 @@ class CourseListView(generic.ListView):
 class CourseCreate(generic.CreateView):
     template_name = 'judge/course_create.html'
     model = Course
-    fields = ['name']
+    fields = ['name', 'assigned_users']
     success_url = reverse_lazy('judge:courses')
+
+    def get_initial(self):
+        user = get_object_or_404(User, id=self.request.user.id)
+        return {'assigned_users': user}
 
     def form_valid(self, form):
         obj = form.save(commit=True)
@@ -148,7 +153,7 @@ class TestCaseView(generic.ListView):
 class TestCaseCreate(generic.CreateView):
     template_name = 'judge/testcase_create.html'
     model = TestCase
-    fields = ['problem', 'input', 'expected_output']
+    fields = ['problem', 'input', 'expected_output', 'points', 'memory_limit', 'time_limit']
 
     def get_initial(self):
         problem = get_object_or_404(Problem, id=self.kwargs.get('problem_pk'))
@@ -163,8 +168,7 @@ class TestCaseCreate(generic.CreateView):
 class TestCaseUpdate(generic.UpdateView):
     template_name_suffix = '_update'
     model = TestCase
-    fields = ['input', 'expected_output',
-              'points', 'memory_limit', 'time_limit']
+    fields = ['problem', 'input', 'expected_output', 'points', 'memory_limit', 'time_limit']
     pk_url_kwarg = 'test_case_pk'
 
     def get_success_url(self):

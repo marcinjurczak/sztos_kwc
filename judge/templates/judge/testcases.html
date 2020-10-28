@@ -23,21 +23,11 @@
                     <tbody>
                     {% for test_case in test_cases_list %}
                         <tr>
-                            <td>
-                                {{ test_case.input }}
-                            </td>
-                            <td>
-                                {{ test_case.expected_output }}
-                            </td>
-                            <td>
-                                {{ test_case.points }}
-                            </td>
-                            <td>
-                                {{ test_case.memory_limit }}
-                            </td>
-                            <td>
-                                {{ test_case.time_limit }}
-                            </td>
+                            <td class="w-25 text-center">{{ test_case.input }}</td>
+                            <td class="w-25 text-center">{{ test_case.expected_output }}</td>
+                            <td class="w-auto text-center">{{ test_case.points }}</td>
+                            <td class="w-auto text-center">{{ test_case.memory_limit }}</td>
+                            <td class="w-auto text-center">{{ test_case.time_limit }}</td>
                             <td class="w-auto text-center">
                                 <a class="btn btn-success my-1"
                                    href="{% url 'judge:test_case_update' test_case.problem.course.id test_case.problem.id test_case.id %}"
