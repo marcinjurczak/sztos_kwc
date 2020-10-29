@@ -233,3 +233,7 @@ def download_solution(request, course_pk, problem_pk, solution_pk):
             archive.writestr(path, content)
 
     return HttpResponse(data.getvalue(), content_type="application/zip")
+
+
+def handler404(request, exception):
+    return render(request, "errors/404.html", status=404)

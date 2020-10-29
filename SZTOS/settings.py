@@ -24,7 +24,7 @@ SECRET_KEY = 'g4e(hg6#4=ax$i@!e_pl+k8#acu09@v0xz&ebqu%8u*)m#tst$'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost']
 
 # Application definition
 

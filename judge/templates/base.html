@@ -19,29 +19,28 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
-                <li class="nav-item active">
+                <li class="nav-item active  m-1">
                     <a class="nav-link" href="{% url 'judge:index' %}">Home <span class="sr-only">(current)</span></a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item  m-1">
                     <a class="nav-link" href="{% url 'judge:courses' %}">Courses</a>
                 </li>
             </ul>
             <ul class="navbar-nav ml-auto">
                 {% if user.is_authenticated %}
-                    <span class="navbar-text m-1">Logged in as {{ user }}</span>
-                    <li class="nav-item">
-                        <a class="btn btn-outline-danger m-1" href="{% url 'logout' %}" type="button">Logout</a>
+                    <li class="navbar-text m-1">Logged in as {{ user }}</li>
+                    <li class="nav-item m-1">
+                        <a class="btn btn-outline-danger" href="{% url 'logout' %}" type="button">Logout</a>
                         {% else %}
-                    <li class="nav-item">
-                        <a class="btn btn-outline-primary m-1" href={% url 'signup' %}>Register</a>
+                    <li class="nav-item m-1">
+                        <a class="btn btn-outline-primary" href={% url 'signup' %}>Register</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="btn btn-outline-success m-1" href="{% url 'login' %}">Login</a>
+                    <li class="nav-item m-1">
+                        <a class="btn btn-outline-success" href="{% url 'login' %}">Login</a>
                     </li>
                 {% endif %}
             </ul>
         </div>
-
     </div>
 </nav>
 
