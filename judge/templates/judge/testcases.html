@@ -5,7 +5,7 @@
 {% block content %}
     <h1 class="h3 font-weight-normal">{{ problem }}</h1>
     <a class="btn btn-success my-1" href="{% url 'judge:test_case_create' problem.course.id problem.id %}"
-       type="button">Add test case</a>
+       role="button">Add test case</a>
     {% if test_cases_list %}
         <div class="card shadow">
             <div class="table-responsive">
@@ -31,10 +31,10 @@
                             <td class="w-auto text-center">
                                 <a class="btn btn-success my-1"
                                    href="{% url 'judge:test_case_update' test_case.problem.course.id test_case.problem.id test_case.id %}"
-                                   type="button">Update</a>
+                                   role="button">Update</a>
                                 <a class="btn btn-danger my-1"
                                    href="{% url 'judge:test_case_delete' test_case.problem.course.id test_case.problem.id test_case.id %}"
-                                   type="button">Delete</a>
+                                   role="button">Delete</a>
                             </td>
                         </tr>
                     {% endfor %}

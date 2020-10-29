@@ -9,7 +9,7 @@ from django.views import generic
 from django.views.decorators.http import require_POST, require_GET
 from django.views.generic.edit import FormMixin
 
-from .forms import SendSolutionForm
+from .forms import SendSolutionForm, ProblemForm, TestCaseForm
 from .models import Course, Problem, Solution, TestRun, TestCase
 from .tasks import validate_solution
 
@@ -73,7 +73,7 @@ class ProblemListView(generic.ListView):
 class ProblemCreate(generic.CreateView):
     template_name = 'judge/problem_create.html'
     model = Problem
-    fields = ['course', 'title', 'description']
+    form_class = ProblemForm
 
     def get_initial(self):
         course = get_object_or_404(Course, id=self.kwargs.get('pk'))
@@ -87,11 +87,15 @@ class ProblemCreate(generic.CreateView):
 class ProblemUpdate(generic.UpdateView):
     template_name_suffix = '_update'
     model = Problem
-    fields = ['course', 'title', 'description']
+    form_class = ProblemForm
     pk_url_kwarg = 'problem_pk'
 
+    def get_initial(self):
+        course = get_object_or_404(Course, id=self.kwargs.get('course_pk'))
+        return {'course': course}
+
     def get_success_url(self):
-        course = get_object_or_404(Course, id=self.kwargs.get('pk'))
+        course = get_object_or_404(Course, id=self.kwargs.get('course_pk'))
         return reverse('judge:problems', args=[course.id])
 
 
@@ -153,7 +157,7 @@ class TestCaseView(generic.ListView):
 class TestCaseCreate(generic.CreateView):
     template_name = 'judge/testcase_create.html'
     model = TestCase
-    fields = ['problem', 'input', 'expected_output', 'points', 'memory_limit', 'time_limit']
+    form_class = TestCaseForm
 
     def get_initial(self):
         problem = get_object_or_404(Problem, id=self.kwargs.get('problem_pk'))
@@ -168,8 +172,12 @@ class TestCaseCreate(generic.CreateView):
 class TestCaseUpdate(generic.UpdateView):
     template_name_suffix = '_update'
     model = TestCase
-    fields = ['problem', 'input', 'expected_output', 'points', 'memory_limit', 'time_limit']
+    form_class = TestCaseForm
     pk_url_kwarg = 'test_case_pk'
+
+    def get_initial(self):
+        problem = get_object_or_404(Problem, id=self.kwargs.get('problem_pk'))
+        return {'problem': problem}
 
     def get_success_url(self):
         course = get_object_or_404(Course, id=self.kwargs.get('course_pk'))
