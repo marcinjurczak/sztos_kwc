@@ -4,13 +4,19 @@
 {% block title %}Login{% endblock %}
 
 {% block content %}
-    <div class="d-flex justify-content-left" id="login">
-        <form class="form form-horizontal" method="post">
-            <h1 class="h3 mb-3 font-weight-normal">Login</h1>
-            {% csrf_token %}
-            {% bootstrap_form form %}
-            <button class="btn btn-success btn-bg" type="submit">Login</button>
-            <a href="{% url 'signup' %}">or sign up</a>
-        </form>
+    <div class="d-flex justify-content-center">
+        <div class="card shadow" id="login">
+            <article class="card-body">
+                <a href="{% url 'signup' %}" class="float-right btn btn-outline-primary">Sign up</a>
+                <h4 class="card-title mb-4 mt-1">Login</h4>
+                <form class="form form-horizontal" method="post">
+                    <div class="form-group">
+                        {% csrf_token %}
+                        {% bootstrap_form form %}
+                        <button type="submit" class="btn btn-primary btn-block"> Login</button>
+                    </div>
+                </form>
+            </article>
+        </div>
     </div>
 {% endblock %}

@@ -16,6 +16,7 @@ urlpatterns = [
     path('course/<int:course_pk>/problem/<int:problem_pk>/delete',
          views.ProblemDelete.as_view(), name='problem_delete'),
     path('course/<int:course_pk>/problem/<int:problem_pk>/', views.ProblemDetailView.as_view(), name='detail'),
+    path('course/<int:course_pk>/problem/<int:problem_pk>/source/', views.SourceCodeView.as_view(), name='source_code'),
     path('course/<int:course_pk>/problem/<int:pk>/grades/', views.ProblemGradesView.as_view(), name='problem_grades'),
     path('course/<int:course_pk>/problem/<int:problem_pk>/tests',
          views.TestCaseView.as_view(), name='test_cases'),

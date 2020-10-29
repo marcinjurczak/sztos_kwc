@@ -4,24 +4,16 @@
 {% block title %}Delete problem{% endblock %}
 
 {% block content %}
-    {% if perms.judge.delete_problem %}
-        <div class="d-flex justify-content-left">
-            <div class="card shadow" style="width: 35rem;">
-                <article class="card-body">
-                    <form class="form" method="post">
-                        <h1 class="h3 mb-3 font-weight-normal">Delete "{{ problem.title }}"?</h1>
-                        {% csrf_token %}
-                        <p>Are you sure you want to delete problem "{{ problem.title }}" with all associated
-                            solutions? </p>
-                        <button class="btn btn-danger btn-bg" type="submit">Delete</button>
-                    </form>
-                </article>
-            </div>
+    <div class="d-flex justify-content-left">
+        <div class="card shadow problem">
+            <article class="card-body">
+                <form class="form" method="post">
+                    <h1 class="h3 mb-3 font-weight-normal">Delete "{{ problem.title }}"?</h1>
+                    {% csrf_token %}
+                    <p>Are you sure you want to delete problem "{{ problem.title }}" with all associated solutions? </p>
+                    <button class="btn btn-danger btn-bg" type="submit">Delete</button>
+                </form>
+            </article>
         </div>
-    {% else %}
-        <div class="alert alert-danger" role="alert">
-            <h4 class="alert-heading">Error</h4>
-            <p>You are not authorized to view this page</p>
-        </div>
-    {% endif %}
+    </div>
 {% endblock %}
