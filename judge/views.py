@@ -1,16 +1,17 @@
 from io import BytesIO
 from zipfile import ZipFile, ZIP_DEFLATED
 
-from django.core.exceptions import PermissionDenied
+from django.contrib.auth.decorators import permission_required
 from django.http import HttpResponseRedirect, HttpResponseBadRequest, HttpResponse
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse, reverse_lazy
+from django.utils.decorators import method_decorator
 from django.views import generic
 from django.views.decorators.http import require_POST, require_GET
 from django.views.generic.edit import FormMixin
 
 from .forms import SendSolutionForm
-from .models import Course, Problem, Solution, TestRun, TestCase
+from .models import Course, Problem, Solution, TestCase
 from .tasks import validate_solution
 
 
@@ -18,6 +19,7 @@ class IndexView(generic.TemplateView):
     template_name = 'judge/index.html'
 
 
+@method_decorator(permission_required('judge.view_course'), name='dispatch')
 class CourseListView(generic.ListView):
     template_name = 'judge/courses.html'
     context_object_name = 'course_list'
@@ -26,6 +28,7 @@ class CourseListView(generic.ListView):
         return Course.objects.filter(assigned_users__id=self.request.user.id)
 
 
+@method_decorator(permission_required('judge.add_course'), name='dispatch')
 class CourseCreate(generic.CreateView):
     template_name = 'judge/course_create.html'
     model = Course
@@ -39,6 +42,7 @@ class CourseCreate(generic.CreateView):
         return super().form_valid(form)
 
 
+@method_decorator(permission_required('judge.change_course'), name='dispatch')
 class CourseUpdate(generic.UpdateView):
     template_name_suffix = '_update'
     model = Course
@@ -46,12 +50,14 @@ class CourseUpdate(generic.UpdateView):
     success_url = reverse_lazy('judge:courses')
 
 
+@method_decorator(permission_required('judge.delete_course'), name='dispatch')
 class CourseDelete(generic.DeleteView):
     template_name_suffix = '_delete'
     model = Course
     success_url = reverse_lazy('judge:courses')
 
 
+@method_decorator(permission_required('judge.view_problem'), name='dispatch')
 class ProblemListView(generic.ListView):
     template_name = 'judge/problems.html'
     context_object_name = 'latest_problem_list'
@@ -66,6 +72,7 @@ class ProblemListView(generic.ListView):
         return context
 
 
+@method_decorator(permission_required('judge.add_problem'), name='dispatch')
 class ProblemCreate(generic.CreateView):
     template_name = 'judge/problem_create.html'
     model = Problem
@@ -80,6 +87,7 @@ class ProblemCreate(generic.CreateView):
         return reverse('judge:problems', args=[course.id])
 
 
+@method_decorator(permission_required('judge.change_problem'), name='dispatch')
 class ProblemUpdate(generic.UpdateView):
     template_name_suffix = '_update'
     model = Problem
@@ -91,6 +99,7 @@ class ProblemUpdate(generic.UpdateView):
         return reverse('judge:problems', args=[course.id])
 
 
+@method_decorator(permission_required('judge.delete_problem'), name='dispatch')
 class ProblemDelete(generic.DeleteView):
     template_name_suffix = '_delete'
     model = Problem
@@ -101,6 +110,7 @@ class ProblemDelete(generic.DeleteView):
         return reverse('judge:problems', args=[course.id])
 
 
+@method_decorator(permission_required('judge.view_problem'), name='dispatch')
 class ProblemDetailView(FormMixin, generic.DetailView):
     model = Problem
     form_class = SendSolutionForm
@@ -124,6 +134,7 @@ class ProblemDetailView(FormMixin, generic.DetailView):
         return context
 
 
+@method_decorator(permission_required('judge.view_grades'), name='dispatch')
 class ProblemGradesView(generic.DetailView):
     model = Problem
     template_name = "judge/problem_grades.html"
@@ -132,6 +143,7 @@ class ProblemGradesView(generic.DetailView):
         return super().get_queryset().filter(course__pk=self.kwargs.get("course_pk"))
 
 
+@method_decorator(permission_required('judge.view_testcase'), name='dispatch')
 class TestCaseView(generic.ListView):
     template_name = "judge/testcases.html"
     context_object_name = 'test_cases_list'
@@ -146,6 +158,7 @@ class TestCaseView(generic.ListView):
         return context
 
 
+@method_decorator(permission_required('judge.add_testcase'), name='dispatch')
 class TestCaseCreate(generic.CreateView):
     template_name = 'judge/testcase_create.html'
     model = TestCase
@@ -161,6 +174,7 @@ class TestCaseCreate(generic.CreateView):
         return reverse('judge:detail', args=[course.id, problem.id])
 
 
+@method_decorator(permission_required('judge.change_testcase'), name='dispatch')
 class TestCaseUpdate(generic.UpdateView):
     template_name_suffix = '_update'
     model = TestCase
@@ -174,6 +188,7 @@ class TestCaseUpdate(generic.UpdateView):
         return reverse('judge:test_cases', args=[course.id, problem.id])
 
 
+@method_decorator(permission_required('judge.delete_testcase'), name='dispatch')
 class TestCaseDelete(generic.DeleteView):
     template_name_suffix = '_delete'
     model = TestCase
