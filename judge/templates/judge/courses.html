@@ -3,16 +3,36 @@
 {% block title %}Courses{% endblock %}
 
 {% block content %}
-    <h1 class="h3 mb-3 font-weight-normal">Courses</h1>
-    <a class="btn btn-success m-1" href="{% url 'judge:add_course' %}" type="button">Add course</a>
-    {% if course_list %}
-        <ul class="list-group">
-            {% for course in course_list %}
-                <a class="list-group-item list-group-item-action"
-                   href="{% url 'judge:problems' course.id %}">{{ course.name }}</a>
-            {% endfor %}
-        </ul>
+    {% if user.is_authenticated %}
+        <h1 class="h3 font-weight-normal">Courses</h1>
+        <a class="btn btn-success my-1" href="{% url 'judge:add_course' %}" role="button">Add course</a>
+        {% if course_list %}
+            <div class="card shadow">
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered m-0">
+                        <thead class="thead-light">
+                        <tr>
+                            <th>Course</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for course in course_list %}
+                            <tr>
+                                <td>
+                                    <a class="nav-link text-dark"
+                                       href="{% url 'judge:problems' course.id %}">{{ course.name }}</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% else %}
+            <p>No courses are available.</p>
+        {% endif %}
     {% else %}
-        <p>No courses are available.</p>
+        <p>You have to be logged in to view this page</p>
+        <a href="{% url 'login' %}">Click here to login</a>
     {% endif %}
 {% endblock %}

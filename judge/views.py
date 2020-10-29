@@ -100,7 +100,7 @@ class ProblemGradesView(generic.DetailView):
 class TestCaseCreate(generic.CreateView):
     template_name = 'judge/add_test_case.html'
     model = TestCase
-    fields = ['problem', 'input', 'expected_output']
+    fields = ['problem', 'input', 'expected_output', 'memory_limit', 'time_limit']
 
     def get_initial(self):
         problem = get_object_or_404(Problem, id=self.kwargs.get('problem_pk'))

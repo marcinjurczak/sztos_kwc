@@ -1,3 +1,4 @@
+{% load static %}
 {% load bootstrap4 %}
 
 <!DOCTYPE html>
@@ -7,36 +8,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>{% block title %}{% endblock %}</title>
     {% bootstrap_css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/judge.css' %}">
 </head>
 <body>
-<nav class="navbar navbar-expand-sm navbar-dark bg-dark mb-3">
+<nav class="navbar navbar-expand-sm navbar-dark bg-dark">
     <div class="container">
-
         <a class="navbar-brand" href="{% url 'judge:index' %}">SZTOS</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+        <button class="navbar-toggler" role="button" data-toggle="collapse" data-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item active">
-                    <a class="nav-link" href="{% url 'judge:index' %}">Home <span class="sr-only">(current)</span></a>
+                    <a class="nav-link m-1" href="{% url 'judge:index' %}">Home <span
+                            class="sr-only">(current)</span></a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'judge:courses' %}">Courses</a>
+                    <a class="nav-link m-1" href="{% url 'judge:courses' %}">Courses</a>
                 </li>
             </ul>
             <ul class="navbar-nav ml-auto">
                 {% if user.is_authenticated %}
                     <span class="navbar-text m-1">Logged in as {{ user }}</span>
                     <li class="nav-item">
-                        <a class="btn btn-outline-danger m-1" href="{% url 'logout' %}" type="button">Logout</a>
+                        <a class="btn btn-outline-danger m-1" href="{% url 'logout' %}" role="button">Logout</a>
                         {% else %}
                     <li class="nav-item">
-                        <a class="btn btn-outline-primary m-1" href={% url 'signup' %}>Register</a>
+                        <a class="btn btn-outline-primary m-1" href="{% url 'signup' %}" role="button">Register</a>
                     </li>
                     <li class="nav-item">
-                        <a class="btn btn-outline-success m-1" href="{% url 'login' %}">Login</a>
+                        <a class="btn btn-outline-success m-1" href="{% url 'login' %}" role="button">Login</a>
                     </li>
                 {% endif %}
             </ul>
@@ -44,8 +46,7 @@
 
     </div>
 </nav>
-
-<div class="container">
+<div class="container my-2">
     {% block content %}
     {% endblock %}
 </div>
