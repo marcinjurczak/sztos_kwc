@@ -186,7 +186,7 @@ class TestCaseCreate(generic.CreateView):
     def get_success_url(self):
         course = get_object_or_404(Course, id=self.kwargs.get('course_pk'))
         problem = get_object_or_404(Problem, id=self.kwargs.get('problem_pk'))
-        return reverse('judge:detail', args=[course.id, problem.id])
+        return reverse('judge:test_cases', args=[course.id, problem.id])
 
 
 class TestCaseUpdate(generic.UpdateView):

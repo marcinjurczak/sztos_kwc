@@ -13,33 +13,6 @@
                     <tr>
                         <th>Problem</th>
                         <th>Grades</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for problem in latest_problem_list %}
-                        <tr>
-                            <td>
-                                <a class="nav-link text-dark" href="{% url 'judge:detail' problem.course.id problem.id %}">
-                                    {{ problem.title }}
-                                </a>
-                            </td>
-                            <td>
-                                <a class="btn btn-primary"
-                                   href="{% url 'judge:problem_grades' problem.course.id problem.id %}">Grades</a>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="card shadow">
-            <div class="table-responsive">
-                <table class="table table-hover table-bordered m-0">
-                    <thead class="thead-light">
-                    <tr>
-                        <th>Problem</th>
-                        <th>Grades</th>
                         <th>Edit</th>
                     </tr>
                     </thead>
