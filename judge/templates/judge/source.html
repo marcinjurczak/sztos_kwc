@@ -7,8 +7,9 @@
     <h1>{{ problem.title }}</h1>
     <h2>{{ problem.description }}</h2>
     {% if solution %}
-        <a href="{% url "judge:download_solution" course_pk problem_pk solution.pk %}">Download</a>
         <h2>Status: {{ solution.get_state_display }}</h2>
+        <a class="btn btn-primary btn-bg"
+           href="{% url "judge:download_solution" course_pk problem_pk solution.pk %}">Download</a>
         {% for name, source in solution.get_sources.items %}
             <div class="card shadow my-1" style="max-width: 40rem">
                 <article class="card-body">

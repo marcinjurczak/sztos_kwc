@@ -121,7 +121,7 @@ class ProblemDelete(generic.DeleteView):
         return reverse('judge:problems', args=[course.id])
 
 
-@method_decorator(permission_required('judge.view_problem'), name='dispatch')
+@method_decorator(permission_required('judge.view_solution'), name='dispatch')
 class ProblemDetailView(FormMixin, generic.DetailView):
     model = Problem
     form_class = SendSolutionForm
