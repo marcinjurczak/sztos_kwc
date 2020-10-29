@@ -1,6 +1,7 @@
 from io import BytesIO
 from zipfile import ZipFile, ZIP_DEFLATED
 
+from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect, HttpResponseBadRequest, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
@@ -8,7 +9,7 @@ from django.views import generic
 from django.views.decorators.http import require_POST, require_GET
 from django.views.generic.edit import FormMixin
 
-from .forms import SendSolutionForm
+from .forms import SendSolutionForm, ProblemForm, TestCaseForm
 from .models import Course, Problem, Solution, TestRun, TestCase
 from .tasks import validate_solution
 
@@ -26,16 +27,33 @@ class CourseListView(generic.ListView):
 
 
 class CourseCreate(generic.CreateView):
-    template_name = 'judge/add_course.html'
+    template_name = 'judge/course_create.html'
     model = Course
-    fields = ['name']
+    fields = ['name', 'assigned_users']
     success_url = reverse_lazy('judge:courses')
+
+    def get_initial(self):
+        user = get_object_or_404(User, id=self.request.user.id)
+        return {'assigned_users': user}
 
     def form_valid(self, form):
         obj = form.save(commit=True)
         obj.assigned_users.add(self.request.user)
         obj.save()
         return super().form_valid(form)
+
+
+class CourseUpdate(generic.UpdateView):
+    template_name_suffix = '_update'
+    model = Course
+    fields = ['name', 'assigned_users']
+    success_url = reverse_lazy('judge:courses')
+
+
+class CourseDelete(generic.DeleteView):
+    template_name_suffix = '_delete'
+    model = Course
+    success_url = reverse_lazy('judge:courses')
 
 
 class ProblemListView(generic.ListView):
@@ -53,13 +71,38 @@ class ProblemListView(generic.ListView):
 
 
 class ProblemCreate(generic.CreateView):
-    template_name = 'judge/add_problem.html'
+    template_name = 'judge/problem_create.html'
     model = Problem
-    fields = ['course', 'title', 'description']
+    form_class = ProblemForm
 
     def get_initial(self):
         course = get_object_or_404(Course, id=self.kwargs.get('pk'))
         return {'course': course}
+
+    def get_success_url(self):
+        course = get_object_or_404(Course, id=self.kwargs.get('pk'))
+        return reverse('judge:problems', args=[course.id])
+
+
+class ProblemUpdate(generic.UpdateView):
+    template_name_suffix = '_update'
+    model = Problem
+    form_class = ProblemForm
+    pk_url_kwarg = 'problem_pk'
+
+    def get_initial(self):
+        course = get_object_or_404(Course, id=self.kwargs.get('course_pk'))
+        return {'course': course}
+
+    def get_success_url(self):
+        course = get_object_or_404(Course, id=self.kwargs.get('course_pk'))
+        return reverse('judge:problems', args=[course.id])
+
+
+class ProblemDelete(generic.DeleteView):
+    template_name_suffix = '_delete'
+    model = Problem
+    pk_url_kwarg = 'problem_pk'
 
     def get_success_url(self):
         course = get_object_or_404(Course, id=self.kwargs.get('pk'))
@@ -117,10 +160,24 @@ class ProblemGradesView(generic.DetailView):
         return super().get_queryset().filter(course__pk=self.kwargs.get("course_pk"))
 
 
+class TestCaseView(generic.ListView):
+    template_name = "judge/testcases.html"
+    context_object_name = 'test_cases_list'
+
+    def get_queryset(self):
+        return TestCase.objects.filter(problem__id=self.kwargs.get('problem_pk'))
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data()
+        context['pk'] = self.kwargs.get('pk')
+        context['problem'] = Problem.objects.get(id=self.kwargs.get('problem_pk'))
+        return context
+
+
 class TestCaseCreate(generic.CreateView):
-    template_name = 'judge/add_test_case.html'
+    template_name = 'judge/testcase_create.html'
     model = TestCase
-    fields = ['problem', 'input', 'expected_output', 'memory_limit', 'time_limit']
+    form_class = TestCaseForm
 
     def get_initial(self):
         problem = get_object_or_404(Problem, id=self.kwargs.get('problem_pk'))
@@ -130,6 +187,33 @@ class TestCaseCreate(generic.CreateView):
         course = get_object_or_404(Course, id=self.kwargs.get('course_pk'))
         problem = get_object_or_404(Problem, id=self.kwargs.get('problem_pk'))
         return reverse('judge:detail', args=[course.id, problem.id])
+
+
+class TestCaseUpdate(generic.UpdateView):
+    template_name_suffix = '_update'
+    model = TestCase
+    form_class = TestCaseForm
+    pk_url_kwarg = 'test_case_pk'
+
+    def get_initial(self):
+        problem = get_object_or_404(Problem, id=self.kwargs.get('problem_pk'))
+        return {'problem': problem}
+
+    def get_success_url(self):
+        course = get_object_or_404(Course, id=self.kwargs.get('course_pk'))
+        problem = get_object_or_404(Problem, id=self.kwargs.get('problem_pk'))
+        return reverse('judge:test_cases', args=[course.id, problem.id])
+
+
+class TestCaseDelete(generic.DeleteView):
+    template_name_suffix = '_delete'
+    model = TestCase
+    pk_url_kwarg = 'test_case_pk'
+
+    def get_success_url(self):
+        course = get_object_or_404(Course, id=self.kwargs.get('course_pk'))
+        problem = get_object_or_404(Problem, id=self.kwargs.get('problem_pk'))
+        return reverse('judge:test_cases', args=[course.id, problem.id])
 
 
 @require_POST

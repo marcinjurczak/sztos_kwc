@@ -5,7 +5,7 @@
 {% block content %}
     {% if user.is_authenticated %}
         <h1 class="h3 font-weight-normal">Courses</h1>
-        <a class="btn btn-success my-1" href="{% url 'judge:add_course' %}" role="button">Add course</a>
+        <a class="btn btn-success my-1" href="{% url 'judge:course_create' %}" role="button">New course</a>
         {% if course_list %}
             <div class="card shadow">
                 <div class="table-responsive">
@@ -13,14 +13,21 @@
                         <thead class="thead-light">
                         <tr>
                             <th>Course</th>
+                            <th>Edit</th>
                         </tr>
                         </thead>
                         <tbody>
                         {% for course in course_list %}
                             <tr>
-                                <td>
-                                    <a class="nav-link text-dark"
+                                <td class="w-75">
+                                    <a class="nav-link text-dark my-1"
                                        href="{% url 'judge:problems' course.id %}">{{ course.name }}</a>
+                                </td>
+                                <td class="w-auto text-center">
+                                    <a class="btn btn-success my-1" href="{% url 'judge:course_update' course.id %}"
+                                       role="button">Update</a>
+                                    <a class="btn btn-danger my-1" href="{% url 'judge:course_delete' course.id %}"
+                                       role="button">Delete</a>
                                 </td>
                             </tr>
                         {% endfor %}

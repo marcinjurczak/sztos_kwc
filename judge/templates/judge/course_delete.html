@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+
+{% block title %}Delete course{% endblock %}
+
+{% block content %}
+    <div class="d-flex justify-content-left">
+        <div class="card shadow course">
+            <article class="card-body">
+                <form class="form" method="post">
+                    <h1 class="h3 mb-3 font-weight-normal">Delete "{{ course.name }}"?</h1>
+                    {% csrf_token %}
+                    <p>Are you sure you want to delete course "{{ course.name }}" with all associated problems and
+                        solutions? </p>
+                    <button class="btn btn-danger btn-bg" type="submit">Delete</button>
+                </form>
+            </article>
+        </div>
+    </div>
+{% endblock %}

@@ -7,10 +7,8 @@
     {% if user.is_authenticated %}
         <h1>{{ problem.title }}</h1>
         <h2>{{ problem.description }}</h2>
-        <a class="btn btn-success m-1" href="{% url 'judge:add_test_case' course_pk problem_pk %}" role="button">
-            Add test case</a>
-        <a class="btn btn-primary btn-bg" href="{% url "judge:source_code" course_pk problem_pk %}">Source</a>
-
+        <a class="btn btn-success my-1" href="{% url 'judge:test_cases' course_pk problem_pk %}" role="button">
+            View test cases</a>
 
         {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
         <div class="d-flex justify-content-left" id="send">
