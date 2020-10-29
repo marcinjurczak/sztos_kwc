@@ -89,6 +89,26 @@ class ProblemDetailView(FormMixin, generic.DetailView):
         return context
 
 
+class SourceCodeView(generic.DetailView):
+    model = Problem
+    template_name = 'judge/source.html'
+    pk_url_kwarg = 'problem_pk'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        solution = Solution.objects.filter(
+            user__id=self.request.user.id,
+            problem__pk=self.kwargs.get('problem_pk')
+        ).last()
+        problem = Problem.objects.get(pk=self.kwargs.get('problem_pk'))
+        context['user'] = self.request.user
+        context['problem_pk'] = problem.id
+        context['course_pk'] = problem.course.id
+        context["solution"] = solution
+
+        return context
+
+
 class ProblemGradesView(generic.DetailView):
     model = Problem
     template_name = "judge/problem_grades.html"
