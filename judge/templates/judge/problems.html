@@ -4,7 +4,7 @@
 
 {% block content %}
     <h1 class="h3 font-weight-normal">{{ course }}</h1>
-    <a class="btn btn-success my-1" href="{% url 'judge:add_problem' pk %}" type="button">Add problem</a>
+    <a class="btn btn-success my-1" href="{% url 'judge:add_problem' pk %}" role="button">Add problem</a>
     {% if latest_problem_list %}
         <div class="card shadow">
             <div class="table-responsive">
