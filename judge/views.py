@@ -235,6 +235,7 @@ class TestCaseDelete(generic.DeleteView):
 
 
 @require_POST
+@permission_required('judge.add_solution')
 def send_solution(request, problem_id) -> HttpResponse:
     problem = get_object_or_404(Problem, pk=problem_id)
 
@@ -252,6 +253,7 @@ def send_solution(request, problem_id) -> HttpResponse:
 
 
 @require_GET
+@permission_required('judge.view_solution')
 def download_solution(request, course_pk, problem_pk, solution_pk):
     solution = get_object_or_404(
         Solution,
