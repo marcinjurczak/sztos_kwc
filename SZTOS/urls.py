@@ -22,3 +22,5 @@ urlpatterns = [
     path('auth/', include('accounts.urls')),  # new
     path('auth/', include('django.contrib.auth.urls')),
 ]
+
+handler404 = 'judge.views.handler404'

@@ -3,14 +3,20 @@
 {% load filters %}
 
 {% block title %}Detail{% endblock %}
+
 {% block content %}
-    {% if user.is_authenticated %}
-        <h1>{{ problem.title }}</h1>
-        <h2>{{ problem.description }}</h2>
+    <h1>{{ problem.title }}</h1>
+    <h2>{{ problem.description }}</h2>
+    {% if perms.judge.view_testcase %}
         <a class="btn btn-success my-1" href="{% url 'judge:test_cases' course_pk problem_pk %}" role="button">
             View test cases</a>
-
-        {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+    {% endif %}
+    {% if perms.judge.view_solution and solution %}
+        <a class="btn btn-primary btn-bg" href="{% url "judge:source_code" course_pk problem_pk %}"
+           role="button">Source</a>
+    {% endif %}
+    {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+    {% if perms.judge.add_solution %}
         <div class="d-flex justify-content-left" id="send">
             <form class="form form-vertical" action="{% url 'judge:send' problem.id %}" method="POST"
                   enctype="multipart/form-data">
@@ -19,40 +25,37 @@
                 <input class="btn btn-secondary btn-bg" type="submit" value="Send">
             </form>
         </div>
-        {% if solution %}
-            <h2>Status: {{ solution.get_state_display }}</h2>
-            {% if solution.test_runs.count > 0 %}
-                <h2>Grade: {% if grade is None %}N/A{% else %}{{ grade | percentage }}{% endif %}</h2>
-                <div class="card shadow">
-                    <div class="table-responsive">
-                        <table class="table table-striped table-bordered m-0">
-                            <thead class="thead-light">
-                            <tr>
-                                <td>#</td>
-                                <td>State</td>
-                                <td>Time [s]</td>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {% for test_run in solution.test_runs.all %}
-                                {% if test_run.get_state_display == 'Valid' %}
-                                    <tr class="table-success w-auto">
-                                        {% else %}
-                                    <tr class="table-danger w-auto">
-                                {% endif %}
-                            <td>{{ forloop.counter }}</td>
-                            <td class="w-75">{{ test_run.get_state_display }}</td>
-                            <td class="w-25">{{ test_run.time }}</td>
-                            </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+    {% endif %}
+    {% if solution %}
+        <h2>Status: {{ solution.get_state_display }}</h2>
+        {% if solution.test_runs.count > 0 %}
+            <h2>Grade: {% if grade is None %}N/A{% else %}{{ grade | percentage }}{% endif %}</h2>
+            <div class="card shadow">
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered m-0">
+                        <thead class="thead-light">
+                        <tr>
+                            <td>#</td>
+                            <td>State</td>
+                            <td>Time [s]</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for test_run in solution.test_runs.all %}
+                            {% if test_run.get_state_display == 'Valid' %}
+                                <tr class="table-success w-auto">
+                                    {% else %}
+                                <tr class="table-danger w-auto">
+                            {% endif %}
+                        <td>{{ forloop.counter }}</td>
+                        <td class="w-75">{{ test_run.get_state_display }}</td>
+                        <td class="w-25">{{ test_run.time }}</td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
-            {% endif %}
+            </div>
         {% endif %}
-    {% else %}
-        <p>You have to be logged in to view this page</p>
-        <a href="{% url 'login' %}">Click here to login</a>
     {% endif %}
 {% endblock %}

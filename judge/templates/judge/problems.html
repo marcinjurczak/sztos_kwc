@@ -4,7 +4,9 @@
 
 {% block content %}
     <h1 class="h3 font-weight-normal">{{ course }}</h1>
-    <a class="btn btn-success my-1" href="{% url 'judge:problem_create' pk %}" role="button">Add problem</a>
+    {% if perms.judge.add_problem %}
+        <a class="btn btn-success my-1" href="{% url 'judge:problem_create' pk %}" role="button">Add problem</a>
+    {% endif %}
     {% if latest_problem_list %}
         <div class="card shadow">
             <div class="table-responsive">
@@ -12,8 +14,12 @@
                     <thead class="thead-light">
                     <tr>
                         <th>Problem</th>
-                        <th>Grades</th>
-                        <th>Edit</th>
+                        {% if perms.judge.view_grades %}
+                            <th>Grades</th>
+                        {% endif %}
+                        {% if perms.judge.change_problem and perms.judge.delete_problem %}
+                            <th>Edit</th>
+                        {% endif %}
                     </tr>
                     </thead>
                     <tbody>
@@ -25,18 +31,22 @@
                                     {{ problem.title }}
                                 </a>
                             </td>
-                            <td class="w-auto text-center">
-                                <a class="btn btn-primary my-1"
-                                   href="{% url 'judge:problem_grades' problem.course.id problem.id %}">Grades</a>
-                            </td>
-                            <td class="w-25 text-center">
-                                <a class="btn btn-success my-1"
-                                   href="{% url 'judge:problem_update' problem.course.id problem.id %}"
-                                   role="button">Update</a>
-                                <a class="btn btn-danger my-1"
-                                   href="{% url 'judge:problem_delete' problem.course.id problem.id %}"
-                                   role="button">Delete</a>
-                            </td>
+                            {% if perms.judge.view_grades %}
+                                <td class="w-auto text-center">
+                                    <a class="btn btn-primary my-1"
+                                       href="{% url 'judge:problem_grades' problem.course.id problem.id %}">Grades</a>
+                                </td>
+                            {% endif %}
+                            {% if perms.judge.change_problem and perms.judge.delete_problem %}
+                                <td class="w-25 text-center">
+                                    <a class="btn btn-success my-1"
+                                       href="{% url 'judge:problem_update' problem.course.id problem.id %}"
+                                       type="button">Update</a>
+                                    <a class="btn btn-danger my-1"
+                                       href="{% url 'judge:problem_delete' problem.course.id problem.id %}"
+                                       type="button">Delete</a>
+                                </td>
+                            {% endif %}
                         </tr>
                     {% endfor %}
                     </tbody>
