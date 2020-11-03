@@ -10,7 +10,7 @@
     {% if course_list %}
         <div class="card shadow">
             <div class="table-responsive">
-                <table class="table table-hover table-bordered m-0">
+                <table class="table table-hover table-bordered m-0 p-0">
                     <thead class="thead-light">
                     <tr>
                         <th>Course</th>
@@ -22,15 +22,19 @@
                     <tbody>
                     {% for course in course_list %}
                         <tr>
-                            <td class="w-75">
-                                <a class="nav-link text-dark my-1"
-                                   href="{% url 'judge:problems' course.id %}">{{ course.name }}</a>
+                            <td class="p-0 align-middle">
+                                <a class="nav-link text-dark"
+                                   href="{% url 'judge:problems' course.id %}">
+                                    {{ course.name }}
+                                </a>
                             </td>
                             {% if perms.judge.change_course and perms.judge.delete_course %}
-                                <td class="w-auto text-center">
-                                    <a class="btn btn-success my-1" href="{% url 'judge:course_update' course.id %}"
+                                <td class="p-0 text-center align-middle">
+                                    <a class="btn btn-sm btn-success m-1"
+                                       href="{% url 'judge:course_update' course.id %}"
                                        role="button">Update</a>
-                                    <a class="btn btn-danger my-1" href="{% url 'judge:course_delete' course.id %}"
+                                    <a class="btn btn-sm btn-danger m-1"
+                                       href="{% url 'judge:course_delete' course.id %}"
                                        role="button">Delete</a>
                                 </td>
                             {% endif %}

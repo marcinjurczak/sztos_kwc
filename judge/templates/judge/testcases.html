@@ -28,11 +28,11 @@
                             <td class="w-auto text-center">{{ test_case.points }}</td>
                             <td class="w-auto text-center">{{ test_case.memory_limit }}</td>
                             <td class="w-auto text-center">{{ test_case.time_limit }}</td>
-                            <td class="w-auto text-center">
-                                <a class="btn btn-success my-1"
+                            <td class="w-auto text-center align-middle p-0">
+                                <a class="btn btn-sm btn-success m-1"
                                    href="{% url 'judge:test_case_update' test_case.problem.course.id test_case.problem.id test_case.id %}"
                                    role="button">Update</a>
-                                <a class="btn btn-danger my-1"
+                                <a class="btn btn-sm btn-danger m-1"
                                    href="{% url 'judge:test_case_delete' test_case.problem.course.id test_case.problem.id test_case.id %}"
                                    role="button">Delete</a>
                             </td>
