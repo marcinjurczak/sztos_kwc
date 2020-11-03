@@ -1,9 +1,20 @@
 {% extends 'base.html' %}
+{% load django_bootstrap_breadcrumbs %}
 {% load bootstrap4 %}
 
 {% block title %}Update test case{% endblock %}
 
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb 'Courses' 'judge:courses' %}
+    {% breadcrumb course.name 'judge:problems' course.id %}
+    {% breadcrumb problem.title 'judge:detail' course.id problem.id %}
+    {% breadcrumb 'Test cases' 'judge:test_cases' course.id problem.id %}
+    {% breadcrumb 'Update' 'judge:test_case_update' course.id problem.id testcase.id %}
+{% endblock %}
+
 {% block content %}
+    {% render_breadcrumbs %}
     <div class="d-flex justify-content-left">
         <div class="card shadow testcase">
             <article class="card-body">

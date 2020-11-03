@@ -1,9 +1,17 @@
 {% extends 'base.html' %}
+{% load django_bootstrap_breadcrumbs %}
 {% load bootstrap4 %}
 
 {% block title %}Add course{% endblock %}
 
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb 'Courses' 'judge:courses' %}
+    {% breadcrumb 'Add course' 'judge:course_create' %}
+{% endblock %}
+
 {% block content %}
+    {% render_breadcrumbs %}
     <div class="d-flex justify-content-left">
         <div class="card shadow course">
             <article class="card-body">

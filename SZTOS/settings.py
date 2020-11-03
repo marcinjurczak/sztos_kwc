@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'accounts.apps.AccountsConfig',
-    "bootstrap4",
+    'bootstrap4',
+    'django_bootstrap_breadcrumbs',
 ]
 
 MIDDLEWARE = [
@@ -115,7 +116,7 @@ USE_TZ = True
 # Fixtures
 
 FIXTURE_DIRS = (
-   '/accounts/fixtures/',
+    '/accounts/fixtures/',
 )
 
 # Static files (CSS, JavaScript, Images)

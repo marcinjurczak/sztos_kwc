@@ -1,18 +1,27 @@
 {% extends 'base.html' %}
+{% load django_bootstrap_breadcrumbs %}
 {% load bootstrap4 %}
 {% load filters %}
 
 {% block title %}Detail{% endblock %}
 
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb 'Courses' 'judge:courses' %}
+    {% breadcrumb course.name 'judge:problems' course.id %}
+    {% breadcrumb problem.title 'judge:detail' course.id problem.id %}
+{% endblock %}
+
 {% block content %}
+    {% render_breadcrumbs %}
     <h1>{{ problem.title }}</h1>
     <h2>{{ problem.description }}</h2>
     {% if perms.judge.view_testcase %}
-        <a class="btn btn-success my-1" href="{% url 'judge:test_cases' course_pk problem_pk %}" role="button">
+        <a class="btn btn-success my-1" href="{% url 'judge:test_cases' course.id problem.id %}" role="button">
             View test cases</a>
     {% endif %}
     {% if perms.judge.view_solution and solution %}
-        <a class="btn btn-primary btn-bg" href="{% url "judge:source_code" course_pk problem_pk solution.id %}"
+        <a class="btn btn-primary btn-bg" href="{% url "judge:source_code" course.id problem.id solution.id %}"
            role="button">Source</a>
     {% endif %}
     {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
@@ -35,9 +44,9 @@
                     <table class="table table-striped table-bordered m-0">
                         <thead class="thead-light">
                         <tr>
-                            <td>#</td>
-                            <td>State</td>
-                            <td>Time [s]</td>
+                            <th>#</th>
+                            <th>State</th>
+                            <th>Time [s]</th>
                         </tr>
                         </thead>
                         <tbody>

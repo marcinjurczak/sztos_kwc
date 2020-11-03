@@ -1,8 +1,15 @@
 {% extends 'base.html' %}
+{% load django_bootstrap_breadcrumbs %}
 
 {% block title %}Courses{% endblock %}
 
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb 'Courses' 'judge:courses' %}
+{% endblock %}
+
 {% block content %}
+    {% render_breadcrumbs %}
     <h1 class="h3 font-weight-normal">Courses</h1>
     {% if perms.judge.add_course %}
         <a class="btn btn-success my-1" href="{% url 'judge:course_create' %}" role="button">New course</a>
