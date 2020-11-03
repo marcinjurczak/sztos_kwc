@@ -28,12 +28,12 @@ class Problem(models.Model):
     def __str__(self):
         return self.title
 
-    def get_grades(self) -> Dict[User, Optional[float]]:
+    def get_solutions(self) -> Dict[User, "Solution"]:
         newest = Subquery(self.solution_set.values("user__pk").annotate(Max("pk")).values("pk__max"))
         solutions = Solution.objects.filter(pk__in=newest).order_by("user__pk")
 
         return {
-            solution.user: solution.get_grade() for solution in solutions
+            solution.user: solution for solution in solutions
         }
 
     class Meta:

@@ -146,22 +146,17 @@ class ProblemDetailView(FormMixin, generic.DetailView):
 
 
 class SourceCodeView(generic.DetailView):
-    model = Problem
+    model = Solution
     template_name = 'judge/source.html'
-    pk_url_kwarg = 'problem_pk'
+    pk_url_kwarg = 'solution_pk'
+
+    def get_queryset(self):
+        return super().get_queryset()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        solution = Solution.objects.filter(
-            user__id=self.request.user.id,
-            problem__pk=self.kwargs.get('problem_pk')
-        ).last()
-        problem = Problem.objects.get(pk=self.kwargs.get('problem_pk'))
-        context['user'] = self.request.user
-        context['problem_pk'] = problem.id
-        context['course_pk'] = problem.course.id
-        context["solution"] = solution
-
+        context['course_pk'] = self.kwargs.get('course_pk')
+        context['problem_pk'] = self.kwargs.get('problem_pk')
         return context
 
 
