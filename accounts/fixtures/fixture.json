@@ -75,6 +75,15 @@
     "model": "auth.permission",
     "id": 9,
     "fields": {
+      "name": "Can view grades",
+      "content_type": 2,
+      "codename": "view_grades"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "id": 10,
+    "fields": {
       "name": "Can add solution",
       "content_type": 3,
       "codename": "add_solution"
@@ -82,7 +91,7 @@
   },
   {
     "model": "auth.permission",
-    "id": 10,
+    "id": 11,
     "fields": {
       "name": "Can change solution",
       "content_type": 3,
@@ -91,7 +100,7 @@
   },
   {
     "model": "auth.permission",
-    "id": 11,
+    "id": 12,
     "fields": {
       "name": "Can delete solution",
       "content_type": 3,
@@ -100,7 +109,7 @@
   },
   {
     "model": "auth.permission",
-    "id": 12,
+    "id": 13,
     "fields": {
       "name": "Can view solution",
       "content_type": 3,
@@ -109,7 +118,7 @@
   },
   {
     "model": "auth.permission",
-    "id": 13,
+    "id": 14,
     "fields": {
       "name": "Can add test case",
       "content_type": 4,
@@ -118,7 +127,7 @@
   },
   {
     "model": "auth.permission",
-    "id": 14,
+    "id": 15,
     "fields": {
       "name": "Can change test case",
       "content_type": 4,
@@ -127,7 +136,7 @@
   },
   {
     "model": "auth.permission",
-    "id": 15,
+    "id": 16,
     "fields": {
       "name": "Can delete test case",
       "content_type": 4,
@@ -136,7 +145,7 @@
   },
   {
     "model": "auth.permission",
-    "id": 16,
+    "id": 17,
     "fields": {
       "name": "Can view test case",
       "content_type": 4,
@@ -145,7 +154,7 @@
   },
   {
     "model": "auth.permission",
-    "id": 17,
+    "id": 18,
     "fields": {
       "name": "Can add test run",
       "content_type": 5,
@@ -154,7 +163,7 @@
   },
   {
     "model": "auth.permission",
-    "id": 18,
+    "id": 19,
     "fields": {
       "name": "Can change test run",
       "content_type": 5,
@@ -163,7 +172,7 @@
   },
   {
     "model": "auth.permission",
-    "id": 19,
+    "id": 20,
     "fields": {
       "name": "Can delete test run",
       "content_type": 5,
@@ -172,7 +181,7 @@
   },
   {
     "model": "auth.permission",
-    "id": 20,
+    "id": 21,
     "fields": {
       "name": "Can view test run",
       "content_type": 5,
@@ -181,7 +190,7 @@
   },
   {
     "model": "auth.permission",
-    "id": 21,
+    "id": 22,
     "fields": {
       "name": "Can add log entry",
       "content_type": 6,
@@ -190,7 +199,7 @@
   },
   {
     "model": "auth.permission",
-    "id": 22,
+    "id": 23,
     "fields": {
       "name": "Can change log entry",
       "content_type": 6,
@@ -199,7 +208,7 @@
   },
   {
     "model": "auth.permission",
-    "id": 23,
+    "id": 24,
     "fields": {
       "name": "Can delete log entry",
       "content_type": 6,
@@ -208,7 +217,7 @@
   },
   {
     "model": "auth.permission",
-    "id": 24,
+    "id": 25,
     "fields": {
       "name": "Can view log entry",
       "content_type": 6,
@@ -217,7 +226,7 @@
   },
   {
     "model": "auth.permission",
-    "id": 25,
+    "id": 26,
     "fields": {
       "name": "Can add permission",
       "content_type": 7,
@@ -226,7 +235,7 @@
   },
   {
     "model": "auth.permission",
-    "id": 26,
+    "id": 27,
     "fields": {
       "name": "Can change permission",
       "content_type": 7,
@@ -235,7 +244,7 @@
   },
   {
     "model": "auth.permission",
-    "id": 27,
+    "id": 28,
     "fields": {
       "name": "Can delete permission",
       "content_type": 7,
@@ -244,7 +253,7 @@
   },
   {
     "model": "auth.permission",
-    "id": 28,
+    "id": 29,
     "fields": {
       "name": "Can view permission",
       "content_type": 7,
@@ -253,7 +262,7 @@
   },
   {
     "model": "auth.permission",
-    "id": 29,
+    "id": 30,
     "fields": {
       "name": "Can add group",
       "content_type": 8,
@@ -262,7 +271,7 @@
   },
   {
     "model": "auth.permission",
-    "id": 30,
+    "id": 31,
     "fields": {
       "name": "Can change group",
       "content_type": 8,
@@ -271,7 +280,7 @@
   },
   {
     "model": "auth.permission",
-    "id": 31,
+    "id": 32,
     "fields": {
       "name": "Can delete group",
       "content_type": 8,
@@ -280,7 +289,7 @@
   },
   {
     "model": "auth.permission",
-    "id": 32,
+    "id": 33,
     "fields": {
       "name": "Can view group",
       "content_type": 8,
@@ -289,7 +298,7 @@
   },
   {
     "model": "auth.permission",
-    "id": 33,
+    "id": 34,
     "fields": {
       "name": "Can add user",
       "content_type": 9,
@@ -298,7 +307,7 @@
   },
   {
     "model": "auth.permission",
-    "id": 34,
+    "id": 35,
     "fields": {
       "name": "Can change user",
       "content_type": 9,
@@ -307,7 +316,7 @@
   },
   {
     "model": "auth.permission",
-    "id": 35,
+    "id": 36,
     "fields": {
       "name": "Can delete user",
       "content_type": 9,
@@ -316,7 +325,7 @@
   },
   {
     "model": "auth.permission",
-    "id": 36,
+    "id": 37,
     "fields": {
       "name": "Can view user",
       "content_type": 9,
@@ -325,7 +334,7 @@
   },
   {
     "model": "auth.permission",
-    "id": 37,
+    "id": 38,
     "fields": {
       "name": "Can add content type",
       "content_type": 10,
@@ -334,7 +343,7 @@
   },
   {
     "model": "auth.permission",
-    "id": 38,
+    "id": 39,
     "fields": {
       "name": "Can change content type",
       "content_type": 10,
@@ -343,7 +352,7 @@
   },
   {
     "model": "auth.permission",
-    "id": 39,
+    "id": 40,
     "fields": {
       "name": "Can delete content type",
       "content_type": 10,
@@ -352,7 +361,7 @@
   },
   {
     "model": "auth.permission",
-    "id": 40,
+    "id": 41,
     "fields": {
       "name": "Can view content type",
       "content_type": 10,
@@ -361,7 +370,7 @@
   },
   {
     "model": "auth.permission",
-    "id": 41,
+    "id": 42,
     "fields": {
       "name": "Can add session",
       "content_type": 11,
@@ -370,7 +379,7 @@
   },
   {
     "model": "auth.permission",
-    "id": 42,
+    "id": 43,
     "fields": {
       "name": "Can change session",
       "content_type": 11,
@@ -379,7 +388,7 @@
   },
   {
     "model": "auth.permission",
-    "id": 43,
+    "id": 44,
     "fields": {
       "name": "Can delete session",
       "content_type": 11,
@@ -388,20 +397,11 @@
   },
   {
     "model": "auth.permission",
-    "id": 44,
+    "id": 45,
     "fields": {
       "name": "Can view session",
       "content_type": 11,
       "codename": "view_session"
-    }
-  },
-  {
-    "model": "auth.permission",
-    "id": 45,
-    "fields": {
-      "name": "Can view grades",
-      "content_type": 2,
-      "codename": "view_grades"
     }
   },
   {
@@ -417,13 +417,14 @@
         5,
         6,
         7,
-        45,
+        9,
         8,
         12,
         13,
         14,
         15,
-        16
+        16,
+        45
       ]
     }
   },
@@ -435,8 +436,10 @@
       "permissions": [
         4,
         8,
-        9,
-        12
+        10,
+        11,
+        12,
+        13
       ]
     }
   }
