@@ -11,10 +11,8 @@ from django.views import generic
 from django.views.decorators.http import require_POST, require_GET
 from django.views.generic.edit import FormMixin
 
-from .forms import SendSolutionForm
-from .models import Course, Problem, Solution, TestCase
 from .forms import SendSolutionForm, ProblemForm, TestCaseForm
-from .models import Course, Problem, Solution, TestRun, TestCase
+from .models import Course, Problem, Solution, TestCase
 from .tasks import validate_solution
 
 
@@ -93,6 +91,11 @@ class ProblemCreate(generic.CreateView):
         course = get_object_or_404(Course, id=self.kwargs.get('pk'))
         return reverse('judge:problems', args=[course.id])
 
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data()
+        context['course'] = Course.objects.get(id=self.kwargs.get('pk'))
+        return context
+
 
 @method_decorator(permission_required('judge.change_problem'), name='dispatch')
 class ProblemUpdate(generic.UpdateView):
@@ -109,6 +112,11 @@ class ProblemUpdate(generic.UpdateView):
         course = get_object_or_404(Course, id=self.kwargs.get('course_pk'))
         return reverse('judge:problems', args=[course.id])
 
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data()
+        context['course'] = Course.objects.get(id=self.kwargs.get('course_pk'))
+        return context
+
 
 @method_decorator(permission_required('judge.delete_problem'), name='dispatch')
 class ProblemDelete(generic.DeleteView):
@@ -117,8 +125,13 @@ class ProblemDelete(generic.DeleteView):
     pk_url_kwarg = 'problem_pk'
 
     def get_success_url(self):
-        course = get_object_or_404(Course, id=self.kwargs.get('pk'))
+        course = get_object_or_404(Course, id=self.kwargs.get('course_pk'))
         return reverse('judge:problems', args=[course.id])
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data()
+        context['course'] = Course.objects.get(id=self.kwargs.get('course_pk'))
+        return context
 
 
 @method_decorator(permission_required('judge.view_problem'), name='dispatch')
@@ -136,8 +149,8 @@ class ProblemDetailView(FormMixin, generic.DetailView):
         ).last()
         problem = Problem.objects.get(pk=self.kwargs.get('problem_pk'))
         context['user'] = self.request.user
-        context['problem_pk'] = problem.id
-        context['course_pk'] = problem.course.id
+        context['course'] = problem.course
+        context['problem'] = problem
         context["solution"] = solution
         if solution:
             context["grade"] = solution.get_grade()
@@ -156,8 +169,8 @@ class SourceCodeView(generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['course_pk'] = self.kwargs.get('course_pk')
-        context['problem_pk'] = self.kwargs.get('problem_pk')
+        context['course'] = Course.objects.get(id=self.kwargs.get('course_pk'))
+        context['problem'] = Problem.objects.get(id=self.kwargs.get('problem_pk'))
         return context
 
 
@@ -168,6 +181,11 @@ class ProblemGradesView(generic.DetailView):
 
     def get_queryset(self):
         return super().get_queryset().filter(course__pk=self.kwargs.get("course_pk"))
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data()
+        context['course'] = Course.objects.get(id=self.kwargs.get('course_pk'))
+        return context
 
 
 @method_decorator(permission_required('judge.view_testcase'), name='dispatch')
@@ -181,6 +199,7 @@ class TestCaseView(generic.ListView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data()
         context['pk'] = self.kwargs.get('pk')
+        context['course'] = Course.objects.get(id=self.kwargs.get('course_pk'))
         context['problem'] = Problem.objects.get(id=self.kwargs.get('problem_pk'))
         return context
 
@@ -200,6 +219,13 @@ class TestCaseCreate(generic.CreateView):
         problem = get_object_or_404(Problem, id=self.kwargs.get('problem_pk'))
         return reverse('judge:test_cases', args=[course.id, problem.id])
 
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data()
+        context['pk'] = self.kwargs.get('pk')
+        context['course'] = Course.objects.get(id=self.kwargs.get('course_pk'))
+        context['problem'] = Problem.objects.get(id=self.kwargs.get('problem_pk'))
+        return context
+
 
 @method_decorator(permission_required('judge.change_testcase'), name='dispatch')
 class TestCaseUpdate(generic.UpdateView):
@@ -217,6 +243,13 @@ class TestCaseUpdate(generic.UpdateView):
         problem = get_object_or_404(Problem, id=self.kwargs.get('problem_pk'))
         return reverse('judge:test_cases', args=[course.id, problem.id])
 
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data()
+        context['pk'] = self.kwargs.get('pk')
+        context['course'] = Course.objects.get(id=self.kwargs.get('course_pk'))
+        context['problem'] = Problem.objects.get(id=self.kwargs.get('problem_pk'))
+        return context
+
 
 @method_decorator(permission_required('judge.delete_testcase'), name='dispatch')
 class TestCaseDelete(generic.DeleteView):
@@ -228,6 +261,13 @@ class TestCaseDelete(generic.DeleteView):
         course = get_object_or_404(Course, id=self.kwargs.get('course_pk'))
         problem = get_object_or_404(Problem, id=self.kwargs.get('problem_pk'))
         return reverse('judge:test_cases', args=[course.id, problem.id])
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data()
+        context['pk'] = self.kwargs.get('pk')
+        context['course'] = Course.objects.get(id=self.kwargs.get('course_pk'))
+        context['problem'] = Problem.objects.get(id=self.kwargs.get('problem_pk'))
+        return context
 
 
 @require_POST

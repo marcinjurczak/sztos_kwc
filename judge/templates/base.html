@@ -1,3 +1,4 @@
+{% load django_bootstrap_breadcrumbs %}
 {% load static %}
 {% load bootstrap4 %}
 
@@ -44,8 +45,13 @@
         </div>
     </div>
 </nav>
+{% block breadcrumbs %}
+    {% clear_breadcrumbs %}
+    {% breadcrumb "Home" 'judge:index' %}
+{% endblock %}
 
 <div class="container my-2">
+
     {% block content %}
     {% endblock %}
 </div>

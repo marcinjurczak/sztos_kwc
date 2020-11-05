@@ -1,16 +1,26 @@
 {% extends 'base.html' %}
+{% load django_bootstrap_breadcrumbs %}
 {% load bootstrap4 %}
 {% load filters %}
 
 {% block title %}Source{% endblock %}
 
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb 'Courses' 'judge:courses' %}
+    {% breadcrumb course.name 'judge:problems' course.id %}
+    {% breadcrumb problem.title 'judge:detail' course.id problem.id %}
+    {% breadcrumb 'Source' 'judge:source_code' course.id problem.id solution.id %}
+{% endblock %}
+
 {% block content %}
+    {% render_breadcrumbs %}
     <h1>{{ problem.title }}</h1>
     <h2>{{ problem.description }}</h2>
     {% if solution %}
         <h2>Status: {{ solution.get_state_display }}</h2>
         <a class="btn btn-primary btn-bg"
-           href="{% url "judge:download_solution" course_pk problem_pk solution.pk %}">Download</a>
+           href="{% url "judge:download_solution" course.id problem.id solution.pk %}">Download</a>
         {% for name, source in solution.get_sources.items %}
             <div class="card shadow my-1 source">
                 <article class="card-body">

@@ -1,8 +1,10 @@
 {% extends 'base.html' %}
+{% load django_bootstrap_breadcrumbs %}
 
 {% block title %}Home{% endblock %}
 
 {% block content %}
+    {% render_breadcrumbs %}
     <h1>SZTOS</h1>
     <h2>Home page</h2>
 {% endblock %}
