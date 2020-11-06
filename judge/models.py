@@ -18,6 +18,11 @@ class Course(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        permissions = (
+            ("remove_user", "Can remove user"),
+        )
+
 
 class Problem(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="courses")

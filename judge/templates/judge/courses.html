@@ -10,9 +10,9 @@
 
 {% block content %}
     {% render_breadcrumbs %}
-    <h1 class="h3 font-weight-normal">Courses</h1>
+    <h2 class="h2 font-weight-normal">Courses</h2>
     {% if perms.judge.add_course %}
-        <a class="btn btn-success my-1" href="{% url 'judge:course_create' %}" role="button">New course</a>
+        <a class="btn btn-success my-1" href="{% url 'judge:course_create' %}">New course</a>
     {% endif %}
     {% if course_list %}
         <div class="card shadow">
@@ -38,11 +38,9 @@
                             {% if perms.judge.change_course and perms.judge.delete_course %}
                                 <td class="p-0 text-center align-middle">
                                     <a class="btn btn-sm btn-success m-1"
-                                       href="{% url 'judge:course_update' course.id %}"
-                                       role="button">Update</a>
+                                       href="{% url 'judge:course_update' course.id %}">Update</a>
                                     <a class="btn btn-sm btn-danger m-1"
-                                       href="{% url 'judge:course_delete' course.id %}"
-                                       role="button">Delete</a>
+                                       href="{% url 'judge:course_delete' course.id %}">Delete</a>
                                 </td>
                             {% endif %}
                         </tr>

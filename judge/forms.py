@@ -1,6 +1,26 @@
 from django import forms
+from django.contrib.auth.models import User
+from django.forms import inlineformset_factory
 
-from judge.models import Problem, TestCase
+from judge.models import Problem, TestCase, Course
+
+
+class CourseCreateForm(forms.ModelForm):
+    class Meta:
+        model = Course
+        fields = ['name', 'assigned_users']
+        widgets = {
+            'assigned_users': forms.CheckboxSelectMultiple()
+        }
+
+
+class CourseUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Course
+        fields = ['name', 'assigned_users']
+        widgets = {
+            'assigned_users': forms.CheckboxSelectMultiple()
+        }
 
 
 class SendSolutionForm(forms.Form):
@@ -30,3 +50,12 @@ class TestCaseForm(forms.ModelForm):
 
     def clean_problem(self):
         return self.initial['problem']
+
+
+class StudentForm(forms.ModelForm):
+    class Meta:
+        model = Course
+        fields = ['assigned_users']
+        widgets = {
+            'assigned_users': forms.CheckboxSelectMultiple()
+        }
