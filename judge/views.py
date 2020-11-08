@@ -342,6 +342,21 @@ def download_solution(request, course_pk, problem_pk, solution_pk):
     return HttpResponse(data.getvalue(), content_type="application/zip")
 
 
+@require_GET
+@permission_required('judge.view_all_solutions')
+def download_all_solutions(request, course_pk, problem_pk):
+    problem = get_object_or_404(Problem, pk=problem_pk, course__pk=course_pk)
+
+    data = BytesIO()
+    with ZipFile(data, "w", ZIP_DEFLATED) as archive:
+        for user, solution in problem.get_solutions().items():
+            sources = solution.get_sources().items()
+            for path, content in sources:
+                archive.writestr(f"{user.username}/{path}", content)
+
+    return HttpResponse(data.getvalue(), content_type="application/zip")
+
+
 @require_POST
 @permission_required('judge.remove_user')
 def remove_user(request, course_pk) -> HttpResponse:
