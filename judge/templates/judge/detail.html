@@ -14,20 +14,27 @@
 
 {% block content %}
     {% render_breadcrumbs %}
-    <h1>{{ problem.title }}</h1>
-    <h2>{{ problem.description }}</h2>
+    <h1 class="h1 font-weight-normal">
+        {{ problem.title }}{% if perms.judge.change_problem and perms.judge.delete_problem %}
+            <a class="btn btn-sm btn-success"
+               href="{% url 'judge:problem_update' problem.course.id problem.id %}">Update</a>
+            <a class="btn btn-sm btn-danger"
+               href="{% url 'judge:problem_delete' problem.course.id problem.id %}">Delete</a>
+        {% endif %}
+    </h1>
+    <h3 class="h3 font-weight-normal">{{ problem.description }}</h3>
     {% if perms.judge.view_testcase %}
-        <a class="btn btn-success my-1" href="{% url 'judge:test_cases' course.id problem.id %}" role="button">
-            View test cases</a>
+        <a class="btn btn-success my-1"
+           href="{% url 'judge:test_cases' course.id problem.id %}">View test cases</a>
     {% endif %}
     {% if perms.judge.view_solution and solution %}
-        <a class="btn btn-primary btn-bg" href="{% url "judge:source_code" course.id problem.id solution.id %}"
-           role="button">Source</a>
+        <a class="btn btn-primary btn-bg"
+           href="{% url "judge:source_code" course.id problem.id solution.id %}">Source</a>
     {% endif %}
     {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
     {% if perms.judge.add_solution %}
         <div class="d-flex justify-content-left" id="send">
-            <form class="form form-vertical" action="{% url 'judge:send' problem.id %}" method="POST"
+            <form class="form form-vertical" action="{% url 'judge:send' course.id problem.id %}" method="POST"
                   enctype="multipart/form-data">
                 {% csrf_token %}
                 {% bootstrap_form form %}

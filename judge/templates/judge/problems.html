@@ -11,10 +11,22 @@
 
 {% block content %}
     {% render_breadcrumbs %}
-    <h1 class="h3 font-weight-normal">{{ course }}</h1>
+    <h2 class="h2 font-weight-normal">{{ course }}
+        {% if perms.judge.change_course and perms.judge.delete_course %}
+            <a class="btn btn-sm btn-success"
+               href="{% url 'judge:course_update' course.id %}">Update</a>
+            <a class="btn btn-sm btn-danger"
+               href="{% url 'judge:course_delete' course.id %}">Delete</a>
+        {% endif %}
+    </h2>
+
     {% if perms.judge.add_problem %}
-        <a class="btn btn-success my-1" href="{% url 'judge:problem_create' pk %}" role="button">Add problem</a>
+        <a class="btn btn-success my-1" href="{% url 'judge:problem_create' course.id %}">Add problem</a>
     {% endif %}
+    {% if perms.judge.remove_user %}
+        <a class="btn btn-primary my-1" href="{% url 'judge:students' course.id %}">Manage students</a>
+    {% endif %}
+
     {% if latest_problem_list %}
         <div class="card shadow">
             <div class="table-responsive">
@@ -48,11 +60,9 @@
                             {% if perms.judge.change_problem and perms.judge.delete_problem %}
                                 <td class="w-auto p-0 mx-1 text-center align-middle">
                                     <a class="btn btn-sm btn-success m-1"
-                                       href="{% url 'judge:problem_update' problem.course.id problem.id %}"
-                                       type="button">Update</a>
+                                       href="{% url 'judge:problem_update' problem.course.id problem.id %}">Update</a>
                                     <a class="btn btn-sm btn-danger m-1"
-                                       href="{% url 'judge:problem_delete' problem.course.id problem.id %}"
-                                       type="button">Delete</a>
+                                       href="{% url 'judge:problem_delete' problem.course.id problem.id %}">Delete</a>
                                 </td>
                             {% endif %}
                         </tr>

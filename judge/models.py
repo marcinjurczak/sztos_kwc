@@ -2,10 +2,10 @@ from typing import Dict, Optional
 from uuid import uuid4
 
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.core.files import File
 from django.core.validators import MinValueValidator
 from django.db import models
-from django.contrib.auth.models import User
 from django.db.models import Sum, Q, Subquery, Max
 
 from judge.storage import s3, get_directory
@@ -17,6 +17,11 @@ class Course(models.Model):
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        permissions = (
+            ("remove_user", "Can remove user"),
+        )
 
 
 class Problem(models.Model):

@@ -11,7 +11,7 @@ from django.views import generic
 from django.views.decorators.http import require_POST, require_GET
 from django.views.generic.edit import FormMixin
 
-from .forms import SendSolutionForm, ProblemForm, TestCaseForm
+from .forms import SendSolutionForm, ProblemForm, TestCaseForm, CourseCreateForm, CourseUpdateForm, StudentForm
 from .models import Course, Problem, Solution, TestCase
 from .tasks import validate_solution
 
@@ -32,8 +32,7 @@ class CourseListView(generic.ListView):
 @method_decorator(permission_required('judge.add_course'), name='dispatch')
 class CourseCreate(generic.CreateView):
     template_name = 'judge/course_create.html'
-    model = Course
-    fields = ['name', 'assigned_users']
+    form_class = CourseCreateForm
     success_url = reverse_lazy('judge:courses')
 
     def get_initial(self):
@@ -50,9 +49,12 @@ class CourseCreate(generic.CreateView):
 @method_decorator(permission_required('judge.change_course'), name='dispatch')
 class CourseUpdate(generic.UpdateView):
     template_name_suffix = '_update'
-    model = Course
-    fields = ['name', 'assigned_users']
+    form_class = CourseUpdateForm
     success_url = reverse_lazy('judge:courses')
+    pk_url_kwarg = 'course_pk'
+
+    def get_queryset(self):
+        return Course.objects.filter(id=self.kwargs.get('course_pk'))
 
 
 @method_decorator(permission_required('judge.delete_course'), name='dispatch')
@@ -60,6 +62,29 @@ class CourseDelete(generic.DeleteView):
     template_name_suffix = '_delete'
     model = Course
     success_url = reverse_lazy('judge:courses')
+    pk_url_kwarg = 'course_pk'
+
+
+@method_decorator(permission_required('judge.remove_user'), name='dispatch')
+class StudentListView(generic.UpdateView):
+    form_class = StudentForm
+    template_name = 'judge/students.html'
+    pk_url_kwarg = 'course_pk'
+
+    def get_queryset(self):
+        course = get_object_or_404(Course, id=self.kwargs.get('course_pk'))
+        return course.assigned_users.get_queryset()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        course = get_object_or_404(Course, id=self.kwargs.get('course_pk'))
+        context['course'] = course
+        kwargs['student_list'] = course.assigned_users.get_queryset()
+        return context
+
+    def get_success_url(self):
+        course = get_object_or_404(Course, id=self.kwargs.get('course_pk'))
+        return reverse('judge:problems', args=[course.id])
 
 
 @method_decorator(permission_required('judge.view_problem'), name='dispatch')
@@ -68,12 +93,11 @@ class ProblemListView(generic.ListView):
     context_object_name = 'latest_problem_list'
 
     def get_queryset(self):
-        return Problem.objects.filter(course__id=self.kwargs.get('pk'))
+        return Problem.objects.filter(course__id=self.kwargs.get('course_pk'))
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data()
-        context['pk'] = self.kwargs.get('pk')
-        context['course'] = Course.objects.get(id=self.kwargs.get('pk'))
+        context['course'] = Course.objects.get(id=self.kwargs.get('course_pk'))
         return context
 
 
@@ -84,16 +108,16 @@ class ProblemCreate(generic.CreateView):
     form_class = ProblemForm
 
     def get_initial(self):
-        course = get_object_or_404(Course, id=self.kwargs.get('pk'))
+        course = get_object_or_404(Course, id=self.kwargs.get('course_pk'))
         return {'course': course}
 
     def get_success_url(self):
-        course = get_object_or_404(Course, id=self.kwargs.get('pk'))
+        course = get_object_or_404(Course, id=self.kwargs.get('course_pk'))
         return reverse('judge:problems', args=[course.id])
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data()
-        context['course'] = Course.objects.get(id=self.kwargs.get('pk'))
+        context['course'] = Course.objects.get(id=self.kwargs.get('course_pk'))
         return context
 
 
@@ -163,9 +187,6 @@ class SourceCodeView(generic.DetailView):
     model = Solution
     template_name = 'judge/source.html'
     pk_url_kwarg = 'solution_pk'
-
-    def get_queryset(self):
-        return super().get_queryset()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -272,8 +293,8 @@ class TestCaseDelete(generic.DeleteView):
 
 @require_POST
 @permission_required('judge.add_solution')
-def send_solution(request, problem_id) -> HttpResponse:
-    problem = get_object_or_404(Problem, pk=problem_id)
+def send_solution(request, course_pk, problem_pk) -> HttpResponse:
+    problem = get_object_or_404(Problem, pk=problem_pk)
 
     if not request.FILES.getlist("sources"):
         return HttpResponseBadRequest("No files sent.")
@@ -305,6 +326,18 @@ def download_solution(request, course_pk, problem_pk, solution_pk):
             archive.writestr(path, content)
 
     return HttpResponse(data.getvalue(), content_type="application/zip")
+
+
+@require_POST
+@permission_required('judge.remove_user')
+def remove_user(request, course_pk) -> HttpResponse:
+    users = request.POST.getlist('users')
+    course = get_object_or_404(Course, pk=course_pk)
+    for user in users:
+        user = get_object_or_404(User, pk=user)
+        course.assigned_users.remove(user)
+    course.save()
+    return HttpResponseRedirect(reverse('judge:problems', args=(course.id,)))
 
 
 def handler404(request, exception):
