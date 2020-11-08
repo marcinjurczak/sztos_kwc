@@ -31,5 +31,7 @@ urlpatterns = [
          views.TestCaseDelete.as_view(), name='test_case_delete'),
     path('course/<int:course_pk>/problem/<int:problem_pk>/solution/<int:solution_pk>/download/',
          views.download_solution, name='download_solution'),
+    path('course/<int:course_pk>/problem/<int:problem_pk>/solutions/download/',
+         views.download_all_solutions, name='download_all_solutions'),
     path('course/<int:course_pk>/problem/<int:problem_pk>/solution/send/', views.send_solution, name='send'),
 ]
