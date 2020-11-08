@@ -10,6 +10,7 @@ from ..models import Solution
 class Runner(ABC):
     _work_dir: TemporaryDirectory
     _source_dir: Path
+    _sources: Dict[str, str]
 
     def __init__(self):
         self._work_dir = TemporaryDirectory()
@@ -18,6 +19,7 @@ class Runner(ABC):
         self._source_dir.mkdir()
 
     def compile(self, sources: Dict[str, str]) -> Optional[TaskResult]:
+        self._sources = sources
         for name, content in sources.items():
             with self._source_dir.joinpath(name).open("wb") as source_file:
                 source_file.write(content.encode("utf-8"))
