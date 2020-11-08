@@ -1,6 +1,6 @@
 from django import forms
 
-from judge.models import Problem, TestCase, Course
+from judge.models import Problem, TestCase, Course, Solution
 
 
 class CourseCreateForm(forms.ModelForm):
@@ -26,6 +26,7 @@ class SendSolutionForm(forms.Form):
         label='Send a file',
         widget=forms.ClearableFileInput(attrs={"multiple": True})
     )
+    language = forms.ChoiceField(choices=Solution.Language.choices)
 
 
 class ProblemForm(forms.ModelForm):

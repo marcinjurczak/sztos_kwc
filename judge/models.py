@@ -57,22 +57,27 @@ class TestCase(models.Model):
 
 
 class Solution(models.Model):
+    class Meta:
+        permissions = (
+            ("view_all_solutions", "Can view all solutions"),
+        )
+
     class State(models.IntegerChoices):
         COMPILATION_PENDING = 0
         COMPILATION_IN_PROGRESS = 1
         COMPILATION_SUCCESSFUL = 2
         COMPILATION_FAILED = 3
 
-    class Meta:
-        permissions = (
-            ("view_all_solutions", "Can view all solutions"),
-        )
+    class Language(models.IntegerChoices):
+        CPP = 0, "C++"
+        PYTHON = 1
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="solutions", default=None)
     problem = models.ForeignKey(Problem, on_delete=models.CASCADE)
     pub_date = models.DateTimeField('date published', auto_now_add=True)
     state = models.IntegerField(choices=State.choices, default=State.COMPILATION_PENDING)
     uuid = models.UUIDField(default=uuid4, editable=False)
+    language = models.IntegerField(choices=Language.choices)
 
     def save_file(self, file: File) -> None:
         s3.put_object(settings.S3_SUBMISSION_BUCKET, f"{self.uuid}/files/{file.name}", file, file.size)

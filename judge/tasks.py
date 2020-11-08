@@ -3,7 +3,7 @@ from logging import Logger
 from celery import shared_task
 from celery.utils.log import get_task_logger
 
-from .env.c import CRunner
+from .env.runner import Runner
 from .models import Solution, TestRun
 
 
@@ -22,13 +22,12 @@ def validate_solution(id: int):
 
 def validate(solution: Solution) -> None:
     log: Logger = get_task_logger(__name__)
-    env = CRunner()
+    env = Runner.for_language(solution.language)
 
-    # call gcc
     log.debug("Compiling")
     result = env.compile(solution.get_sources())
 
-    if result.return_code != 0:
+    if result and result.return_code != 0:
         log.info(f"Compilation failed. GCC exited with error code {result.return_code}.")
         log.info(f"stdout: {result.stdout.decode('utf-8')}")
         log.info(f"stderr: {result.stderr.decode('utf-8')}")
