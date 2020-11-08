@@ -3,7 +3,7 @@ from zipfile import ZipFile, ZIP_DEFLATED
 
 from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.models import User
-from django.http import HttpResponseRedirect, HttpResponseBadRequest, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponseBadRequest, HttpResponse, Http404
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
@@ -194,6 +194,12 @@ class SourceCodeView(generic.DetailView):
         context['problem'] = Problem.objects.get(id=self.kwargs.get('problem_pk'))
         return context
 
+    def get(self, request, *args, **kwargs):
+        if self.object.user != request.user and not request.user.has_perm("judge.view_all_solutions"):
+            raise Http404()
+
+        return super().get(request, *args, **kwargs)
+
 
 @method_decorator(permission_required('judge.view_grades'), name='dispatch')
 class ProblemGradesView(generic.DetailView):
@@ -294,7 +300,10 @@ class TestCaseDelete(generic.DeleteView):
 @require_POST
 @permission_required('judge.add_solution')
 def send_solution(request, course_pk, problem_pk) -> HttpResponse:
-    problem = get_object_or_404(Problem, pk=problem_pk)
+    problem = get_object_or_404(Problem, pk=problem_pk, course__pk=course_pk)
+
+    if not problem.course.assigned_users.filter(id=request.user.id).exists():
+        raise Http404()
 
     if not request.FILES.getlist("sources"):
         return HttpResponseBadRequest("No files sent.")
@@ -318,6 +327,9 @@ def download_solution(request, course_pk, problem_pk, solution_pk):
         problem__pk=problem_pk,
         problem__course__pk=course_pk
     )
+
+    if solution.user != request.user and not request.user.has_perm("judge.view_all_solutions"):
+        raise Http404()
 
     data = BytesIO()
     with ZipFile(data, "w", ZIP_DEFLATED) as archive:
