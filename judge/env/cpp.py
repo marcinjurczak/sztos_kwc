@@ -41,5 +41,3 @@ class CPPRunner(Runner):
         )
 
         return task.execute()
-
-
