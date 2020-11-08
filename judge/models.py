@@ -63,6 +63,11 @@ class Solution(models.Model):
         COMPILATION_SUCCESSFUL = 2
         COMPILATION_FAILED = 3
 
+    class Meta:
+        permissions = (
+            ("view_all_solutions", "Can view all solutions"),
+        )
+
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="solutions", default=None)
     problem = models.ForeignKey(Problem, on_delete=models.CASCADE)
     pub_date = models.DateTimeField('date published', auto_now_add=True)
