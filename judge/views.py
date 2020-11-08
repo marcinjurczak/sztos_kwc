@@ -329,6 +329,7 @@ def download_solution(request, course_pk, problem_pk, solution_pk):
 
 
 @require_POST
+@permission_required('judge.remove_user')
 def remove_user(request, course_pk) -> HttpResponse:
     users = request.POST.getlist('users')
     course = get_object_or_404(Course, pk=course_pk)

@@ -1,10 +1,10 @@
+from dataclasses import dataclass, field
 from datetime import timedelta, datetime
 from logging import Logger
 from pathlib import Path
 from subprocess import Popen, PIPE, TimeoutExpired
 from tempfile import TemporaryDirectory
 from typing import Tuple, List, Optional
-from dataclasses import dataclass, field
 
 from celery import shared_task
 from celery.utils.log import get_task_logger
