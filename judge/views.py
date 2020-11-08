@@ -306,7 +306,11 @@ def send_solution(request, course_pk, problem_pk) -> HttpResponse:
     if not request.FILES.getlist("sources"):
         return HttpResponseBadRequest("No files sent.")
 
-    solution = Solution(problem=problem, user=request.user)
+    form = SendSolutionForm(request.POST, files=request.FILES)
+    if not form.is_valid():
+        return HttpResponseBadRequest("Incorrect form data.")
+
+    solution = Solution(problem=problem, user=request.user, language=form.cleaned_data["language"])
 
     for file in request.FILES.getlist("sources"):
         solution.save_file(file)
