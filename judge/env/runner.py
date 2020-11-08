@@ -32,12 +32,12 @@ class Runner(ABC):
         self._work_dir.cleanup()
 
     @staticmethod
-    def for_language(language: Solution.Language) -> "Runner":
+    def for_language(language: int) -> "Runner":
         if language == Solution.Language.CPP:
-            from .c import CRunner
-            return CRunner()
+            from .cpp import CPPRunner
+            return CPPRunner()
         elif language == Solution.Language.PYTHON:
             from .python import PythonRunner
             return PythonRunner()
 
-        raise ValueError(f"No runner for language: {language.name}")
+        raise ValueError(f"No runner for language: {language}")

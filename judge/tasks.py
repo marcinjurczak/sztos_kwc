@@ -17,7 +17,6 @@ def validate_solution(id: int):
         validate(solution)
     except Exception as e:
         get_task_logger(__name__).error("An exception was thrown during validation.", e)
-        # TODO: update solution state
 
 
 def validate(solution: Solution) -> None:
@@ -28,7 +27,7 @@ def validate(solution: Solution) -> None:
     result = env.compile(solution.get_sources())
 
     if result and result.return_code != 0:
-        log.info(f"Compilation failed. GCC exited with error code {result.return_code}.")
+        log.info(f"Compilation failed. Process exited with error code {result.return_code}.")
         log.info(f"stdout: {result.stdout.decode('utf-8')}")
         log.info(f"stderr: {result.stderr.decode('utf-8')}")
         solution.state = Solution.State.COMPILATION_FAILED

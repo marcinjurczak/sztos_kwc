@@ -5,7 +5,7 @@ from .runner import Runner
 from .tasks import TaskResult, Task
 
 
-class CRunner(Runner):
+class CPPRunner(Runner):
     _build_dir: Path
 
     def __init__(self):
