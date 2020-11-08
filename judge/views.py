@@ -190,15 +190,13 @@ class SourceCodeView(generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['course'] = Course.objects.get(id=self.kwargs.get('course_pk'))
-        context['problem'] = Problem.objects.get(id=self.kwargs.get('problem_pk'))
-        return context
-
-    def get(self, request, *args, **kwargs):
-        if self.object.user != request.user and not request.user.has_perm("judge.view_all_solutions"):
+        if context['solution'].user != self.request.user and not self.request.user.has_perm("judge.view_all_solutions"):
             raise Http404()
 
-        return super().get(request, *args, **kwargs)
+        context['course'] = Course.objects.get(id=self.kwargs.get('course_pk'))
+        context['problem'] = Problem.objects.get(id=self.kwargs.get('problem_pk'))
+
+        return context
 
 
 @method_decorator(permission_required('judge.view_grades'), name='dispatch')
