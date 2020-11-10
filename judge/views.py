@@ -72,15 +72,7 @@ class StudentListView(generic.UpdateView):
     pk_url_kwarg = 'course_pk'
 
     def get_queryset(self):
-        course = get_object_or_404(Course, id=self.kwargs.get('course_pk'))
-        return course.assigned_users.get_queryset()
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        course = get_object_or_404(Course, id=self.kwargs.get('course_pk'))
-        context['course'] = course
-        kwargs['student_list'] = course.assigned_users.get_queryset()
-        return context
+        return Course.objects.filter(id=self.kwargs.get('course_pk'))
 
     def get_success_url(self):
         course = get_object_or_404(Course, id=self.kwargs.get('course_pk'))
