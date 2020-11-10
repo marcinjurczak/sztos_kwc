@@ -60,6 +60,8 @@
                         {% for test_run in solution.test_runs.all %}
                             {% if test_run.get_state_display == 'Valid' %}
                                 <tr class="table-success w-auto">
+                                    {% elif test_run.get_state_display == 'Pending' %}
+                                <tr class="table-info w-auto">
                                     {% else %}
                                 <tr class="table-danger w-auto">
                             {% endif %}

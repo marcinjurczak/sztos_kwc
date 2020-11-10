@@ -41,6 +41,13 @@ class Problem(models.Model):
             solution.user: solution for solution in solutions
         }
 
+    def run_all_solutions(self) -> None:
+        solutions = Solution.objects.filter(problem=self)
+        for solution in solutions:
+            from judge.tasks import validate_solution
+            TestRun.objects.filter(solution=solution).delete()
+            validate_solution.delay(solution.id)
+
     class Meta:
         permissions = (
             ("view_grades", "Can view grades"),
