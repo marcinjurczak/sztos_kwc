@@ -42,7 +42,8 @@ class Problem(models.Model):
         }
 
     def run_all_solutions(self) -> None:
-        solutions = Solution.objects.filter(problem=self)
+        newest = Subquery(self.solution_set.values("user__pk").annotate(Max("pk")).values("pk__max"))
+        solutions = Solution.objects.filter(pk__in=newest).order_by("user__pk")
         for solution in solutions:
             from judge.tasks import validate_solution
             TestRun.objects.filter(solution=solution).delete()
