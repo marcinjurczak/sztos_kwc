@@ -234,6 +234,7 @@ class TestCaseCreate(generic.CreateView):
     def get_success_url(self):
         course = get_object_or_404(Course, id=self.kwargs.get('course_pk'))
         problem = get_object_or_404(Problem, id=self.kwargs.get('problem_pk'))
+        problem.run_all_solutions()
         return reverse('judge:test_cases', args=[course.id, problem.id])
 
     def get_context_data(self, *, object_list=None, **kwargs):
@@ -258,6 +259,7 @@ class TestCaseUpdate(generic.UpdateView):
     def get_success_url(self):
         course = get_object_or_404(Course, id=self.kwargs.get('course_pk'))
         problem = get_object_or_404(Problem, id=self.kwargs.get('problem_pk'))
+        problem.run_all_solutions()
         return reverse('judge:test_cases', args=[course.id, problem.id])
 
     def get_context_data(self, *, object_list=None, **kwargs):
@@ -277,6 +279,7 @@ class TestCaseDelete(generic.DeleteView):
     def get_success_url(self):
         course = get_object_or_404(Course, id=self.kwargs.get('course_pk'))
         problem = get_object_or_404(Problem, id=self.kwargs.get('problem_pk'))
+        problem.run_all_solutions()
         return reverse('judge:test_cases', args=[course.id, problem.id])
 
     def get_context_data(self, *, object_list=None, **kwargs):
