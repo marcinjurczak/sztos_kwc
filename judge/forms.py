@@ -4,12 +4,11 @@ from judge.models import Problem, TestCase, Course, Solution
 
 
 class CourseCreateForm(forms.ModelForm):
+    assigned_users = forms.CharField(widget=forms.Textarea())
+
     class Meta:
         model = Course
-        fields = ['name', 'assigned_users']
-        widgets = {
-            'assigned_users': forms.CheckboxSelectMultiple()
-        }
+        fields = ['name']
 
 
 class CourseUpdateForm(forms.ModelForm):

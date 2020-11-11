@@ -41,6 +41,12 @@ class CourseCreate(generic.CreateView):
 
     def form_valid(self, form):
         obj = form.save(commit=True)
+        users = form.cleaned_data['assigned_users'].split()
+        for user in users:
+            student = User.objects.filter(username=user).first()
+            if student:
+                obj.assigned_users.add(student.id)
+
         obj.assigned_users.add(self.request.user)
         obj.save()
         return super().form_valid(form)
