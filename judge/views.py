@@ -36,10 +36,6 @@ class CourseCreate(generic.CreateView):
     form_class = CourseCreateForm
     success_url = reverse_lazy('judge:courses')
 
-    def get_initial(self):
-        user = get_object_or_404(User, id=self.request.user.id)
-        return {'student_list': user}
-
     def form_valid(self, form):
         obj = form.save(commit=True)
         users = form.cleaned_data['student_list'].split()
