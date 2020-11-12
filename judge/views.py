@@ -11,6 +11,7 @@ from django.views import generic
 from django.views.decorators.http import require_POST, require_GET
 from django.views.generic.edit import FormMixin
 
+from . import forms
 from .forms import SendSolutionForm, ProblemForm, TestCaseForm, CourseCreateForm, CourseUpdateForm, StudentForm
 from .models import Course, Problem, Solution, TestCase
 from .tasks import validate_solution
@@ -37,16 +38,15 @@ class CourseCreate(generic.CreateView):
 
     def get_initial(self):
         user = get_object_or_404(User, id=self.request.user.id)
-        return {'assigned_users': user}
+        return {'student_list': user}
 
     def form_valid(self, form):
         obj = form.save(commit=True)
-        users = form.cleaned_data['assigned_users'].split()
+        users = form.cleaned_data['student_list'].split()
         for user in users:
             student = User.objects.filter(username=user).first()
             if student:
                 obj.assigned_users.add(student.id)
-
         obj.assigned_users.add(self.request.user)
         obj.save()
         return super().form_valid(form)
@@ -58,9 +58,24 @@ class CourseUpdate(generic.UpdateView):
     form_class = CourseUpdateForm
     success_url = reverse_lazy('judge:courses')
     pk_url_kwarg = 'course_pk'
+    label = 'test'
 
     def get_queryset(self):
         return Course.objects.filter(id=self.kwargs.get('course_pk'))
+
+    def form_valid(self, form):
+        obj = form.save(commit=True)
+        Course.objects.get(id=self.kwargs.get('course_pk')).assigned_users.clear()
+        users = form.cleaned_data['student_list'].split()
+        for user in users:
+            student = User.objects.filter(username=user).first()
+            if student:
+                obj.assigned_users.add(student.id)
+            else:
+                raise forms.ValidationError('no_user')
+        obj.assigned_users.add(self.request.user)
+        obj.save()
+        return super().form_valid(form)
 
 
 @method_decorator(permission_required('judge.delete_course'), name='dispatch')
