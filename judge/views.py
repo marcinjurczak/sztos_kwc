@@ -12,7 +12,8 @@ from django.views.decorators.http import require_POST, require_GET
 from django.views.generic.edit import FormMixin
 
 from . import forms
-from .forms import SendSolutionForm, ProblemForm, TestCaseForm, CourseCreateForm, CourseUpdateForm, StudentForm
+from .forms import SendSolutionForm, ProblemForm, TestCaseForm, CourseCreateUpdateForm, StudentForm, \
+    CourseAddStudentsForm
 from .models import Course, Problem, Solution, TestCase
 from .tasks import validate_solution
 
@@ -33,7 +34,7 @@ class CourseListView(generic.ListView):
 @method_decorator(permission_required('judge.add_course'), name='dispatch')
 class CourseCreate(generic.CreateView):
     template_name = 'judge/course_create.html'
-    form_class = CourseCreateForm
+    form_class = CourseCreateUpdateForm
     success_url = reverse_lazy('judge:courses')
 
     def form_valid(self, form):
@@ -51,10 +52,8 @@ class CourseCreate(generic.CreateView):
 @method_decorator(permission_required('judge.change_course'), name='dispatch')
 class CourseUpdate(generic.UpdateView):
     template_name_suffix = '_update'
-    form_class = CourseUpdateForm
-    success_url = reverse_lazy('judge:courses')
+    form_class = CourseCreateUpdateForm
     pk_url_kwarg = 'course_pk'
-    label = 'test'
 
     def get_queryset(self):
         return Course.objects.filter(id=self.kwargs.get('course_pk'))
@@ -67,11 +66,38 @@ class CourseUpdate(generic.UpdateView):
             student = User.objects.filter(username=user).first()
             if student:
                 obj.assigned_users.add(student.id)
-            else:
-                raise forms.ValidationError('no_user')
         obj.assigned_users.add(self.request.user)
         obj.save()
         return super().form_valid(form)
+
+    def get_success_url(self):
+        course = get_object_or_404(Course, id=self.kwargs.get('course_pk'))
+        return reverse('judge:problems', args=[course.id])
+
+
+class CourseAddStudents(generic.UpdateView):
+    template_name_suffix = '_add_students'
+    form_class = CourseAddStudentsForm
+    pk_url_kwarg = 'course_pk'
+    label = 'test'
+
+    def get_queryset(self):
+        return Course.objects.filter(id=self.kwargs.get('course_pk'))
+
+    def form_valid(self, form):
+        obj = form.save(commit=True)
+        users = form.cleaned_data['student_list'].split()
+        for user in users:
+            student = User.objects.filter(username=user).first()
+            if student:
+                obj.assigned_users.add(student.id)
+        obj.assigned_users.add(self.request.user)
+        obj.save()
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        course = get_object_or_404(Course, id=self.kwargs.get('course_pk'))
+        return reverse('judge:students', args=[course.id])
 
 
 @method_decorator(permission_required('judge.delete_course'), name='dispatch')
@@ -378,7 +404,7 @@ def remove_user(request, course_pk) -> HttpResponse:
         user = get_object_or_404(User, pk=user)
         course.assigned_users.remove(user)
     course.save()
-    return HttpResponseRedirect(reverse('judge:problems', args=(course.id,)))
+    return HttpResponseRedirect(reverse('judge:students', args=(course.id,)))
 
 
 def handler404(request, exception):
