@@ -7,7 +7,7 @@
     {{ block.super }}
     {% breadcrumb 'Courses' 'judge:courses' %}
     {% breadcrumb course.name 'judge:problems' course.id %}
-    {% breadcrumb 'Update' 'judge:course_update' course.id %}
+    {% breadcrumb 'Assign students' 'judge:course_update' course.id %}
 {% endblock %}
 
 {% block content %}
