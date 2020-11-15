@@ -59,7 +59,7 @@ class CourseUpdate(generic.UpdateView):
 
     def form_valid(self, form):
         obj = form.save(commit=True)
-        Course.objects.get(id=self.kwargs.get('course_pk')).assigned_users.clear()
+        obj.assigned_users.clear()
         users = form.cleaned_data['student_list'].split()
         for user in users:
             student = User.objects.filter(username=user).first()
