@@ -11,7 +11,6 @@ from django.views import generic
 from django.views.decorators.http import require_POST, require_GET
 from django.views.generic.edit import FormMixin
 
-from . import forms
 from .forms import SendSolutionForm, ProblemForm, TestCaseForm, CourseCreateUpdateForm, StudentForm, \
     CourseAddStudentsForm
 from .models import Course, Problem, Solution, TestCase
@@ -75,6 +74,7 @@ class CourseUpdate(generic.UpdateView):
         return reverse('judge:problems', args=[course.id])
 
 
+@method_decorator(permission_required('judge.change_course'), name='dispatch')
 class CourseAddStudents(generic.UpdateView):
     template_name_suffix = '_add_students'
     form_class = CourseAddStudentsForm
