@@ -15,7 +15,6 @@ class CourseCreateUpdateForm(forms.ModelForm):
     def clean(self):
         super().clean()
         user_list = self.cleaned_data['student_list'].split()
-        User.objects.exclude(username__in=user_list)
         users = User.objects.filter(username__in=user_list)
         users_set = set(user.username for user in users)
         not_in_db = set(user_list) - users_set
@@ -39,7 +38,6 @@ class CourseAddStudentsForm(forms.ModelForm):
     def clean(self):
         super().clean()
         user_list = self.cleaned_data['student_list'].split()
-        User.objects.exclude(username__in=user_list)
         users = User.objects.filter(username__in=user_list)
         users_set = set(user.username for user in users)
         not_in_db = set(user_list) - users_set
