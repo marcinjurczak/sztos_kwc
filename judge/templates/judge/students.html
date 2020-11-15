@@ -15,7 +15,11 @@
     <h1 class="h3 font-weight-normal">{{ course.name }} students</h1>
     {% if course.assigned_users %}
         <form action="{% url 'judge:remove_users' course.id %}" method="post">
-            <input class="btn btn-danger my-1" type="submit" value="Remove">
+            <input class="btn btn-danger my-1" type="submit" value="Remove selected">
+            {% if perms.judge.change_course %}
+                <a class="btn btn-success my-1"
+                   href="{% url 'judge:course_add_students' course.id %}">Assign new students</a>
+            {% endif %}
             {% csrf_token %}
             <div class="card shadow">
                 <div class="table-responsive">

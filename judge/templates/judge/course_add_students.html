@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load django_bootstrap_breadcrumbs %}
+{% load bootstrap4 %}
+
+{% block title %}Assign students{% endblock %}
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb 'Courses' 'judge:courses' %}
+    {% breadcrumb course.name 'judge:problems' course.id %}
+    {% breadcrumb 'Assign students' 'judge:course_update' course.id %}
+{% endblock %}
+
+{% block content %}
+    {% render_breadcrumbs %}
+    <div class="d-flex justify-content-left">
+        <div class="card shadow course">
+            <article class="card-body">
+                <form class="form" method="post">
+                    <h1 class="h3 mb-3 font-weight-normal">Assign new students</h1>
+                    {% csrf_token %}
+                    {% bootstrap_form form %}
+                    <button class="btn btn-success btn-bg" type="submit">Assign students</button>
+                </form>
+            </article>
+        </div>
+    </div>
+{% endblock %}
