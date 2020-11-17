@@ -1,4 +1,5 @@
-from io import BytesIO
+import csv
+from io import BytesIO, StringIO
 from zipfile import ZipFile, ZIP_DEFLATED
 
 from django.contrib.auth.decorators import permission_required
@@ -106,6 +107,36 @@ class CourseDelete(generic.DeleteView):
     model = Course
     success_url = reverse_lazy('judge:courses')
     pk_url_kwarg = 'course_pk'
+
+
+@method_decorator(permission_required('judge.view_grades'), name='dispatch')
+class CourseGrades(generic.DetailView):
+    template_name_suffix = '_grades'
+    model = Course
+    pk_url_kwarg = 'course_pk'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        grades = {}
+        problems = self.object.problems.all()
+        users = self.object.assigned_users.all()
+
+        for problem in problems:
+            solutions = problem.get_solutions()
+            for user in users:
+                if solutions.get(user):
+                    grade = solutions[user].get_grade()
+                else:
+                    grade = 0
+
+                if user in grades:
+                    grades[user].append(grade)
+                else:
+                    grades[user] = [grade]
+
+        context['problems'] = problems
+        context['user_grades'] = grades
+        return context
 
 
 @method_decorator(permission_required('judge.remove_user'), name='dispatch')
@@ -378,6 +409,40 @@ def download_solution(request, course_pk, problem_pk, solution_pk):
             archive.writestr(path, content)
 
     return HttpResponse(data.getvalue(), content_type="application/zip")
+
+
+@require_GET
+@permission_required('judge.view_grades')
+def course_grades_csv(request, course_pk):
+    course = get_object_or_404(Course, pk=course_pk)
+
+    course_grades = {}
+    problems = course.problems.all()
+    users = course.assigned_users.all()
+
+    for problem in problems:
+        solutions = problem.get_solutions()
+        for user in users:
+            if solutions.get(user):
+                grade = solutions[user].get_grade()
+            else:
+                grade = 0
+
+            if user in course_grades:
+                course_grades[user].append(grade)
+            else:
+                course_grades[user] = [grade]
+
+    file = StringIO()
+    report_writer = csv.writer(file)
+
+    problem_titles = (problem.title for problem in problems)
+    report_writer.writerow(["User", *problem_titles])
+
+    for user, grades in course_grades.items():
+        report_writer.writerow([user, *grades])
+
+    return HttpResponse(file.getvalue(), content_type="text/csv")
 
 
 @require_GET

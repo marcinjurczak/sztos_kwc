@@ -25,7 +25,7 @@ class Course(models.Model):
 
 
 class Problem(models.Model):
-    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="courses")
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="problems")
     title = models.CharField(max_length=100)
     description = models.TextField(blank=True)
     pub_date = models.DateTimeField('date published', auto_now_add=True)

@@ -26,6 +26,9 @@
     {% if perms.judge.remove_user %}
         <a class="btn btn-primary my-1" href="{% url 'judge:students' course.id %}">Manage students</a>
     {% endif %}
+    {% if perms.judge.view_grades %}
+        <a class="btn btn-primary my-1" href="{% url 'judge:course_grades' course.id %}">View grades</a>
+    {% endif %}
 
     {% if latest_problem_list %}
         <div class="card shadow">
