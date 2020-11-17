@@ -11,6 +11,11 @@
 {% endblock %}
 
 {% block content %}
+    <a class="btn btn-primary my-1"
+       href="{% url "judge:course_grades_csv" course.id %}"
+       download>
+        Download as CSV
+    </a>
     <table class="table table-bordered">
     <thead class="thead-dark">
         <tr>
