@@ -1,24 +1,53 @@
 from django import forms
+from django.contrib.auth.models import User
 
 from judge.models import Problem, TestCase, Course, Solution
 
 
-class CourseCreateForm(forms.ModelForm):
+class CourseCreateUpdateForm(forms.ModelForm):
+    student_list = forms.CharField(widget=forms.Textarea(),
+                                   help_text='Insert users next to each other or line by line')
+
     class Meta:
         model = Course
-        fields = ['name', 'assigned_users']
-        widgets = {
-            'assigned_users': forms.CheckboxSelectMultiple()
-        }
+        fields = ['name']
+
+    def clean(self):
+        super().clean()
+        user_list = self.cleaned_data['student_list'].split()
+        users = User.objects.filter(username__in=user_list)
+        users_set = set(user.username for user in users)
+        not_in_db = set(user_list) - users_set
+
+        if not_in_db:
+            self._errors['student_list'] = self.error_class([
+                'No such users exist:'])
+            for user in not_in_db:
+                self.add_error('student_list', user)
+        return self.cleaned_data
 
 
-class CourseUpdateForm(forms.ModelForm):
+class CourseAddStudentsForm(forms.ModelForm):
+    student_list = forms.CharField(widget=forms.Textarea(),
+                                   help_text='Insert users next to each other or line by line')
+
     class Meta:
         model = Course
-        fields = ['name', 'assigned_users']
-        widgets = {
-            'assigned_users': forms.CheckboxSelectMultiple()
-        }
+        fields = []
+
+    def clean(self):
+        super().clean()
+        user_list = self.cleaned_data['student_list'].split()
+        users = User.objects.filter(username__in=user_list)
+        users_set = set(user.username for user in users)
+        not_in_db = set(user_list) - users_set
+
+        if not_in_db:
+            self._errors['student_list'] = self.error_class([
+                'No such users exist:'])
+            for user in not_in_db:
+                self.add_error('student_list', user)
+        return self.cleaned_data
 
 
 class SendSolutionForm(forms.Form):
