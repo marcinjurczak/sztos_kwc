@@ -22,7 +22,7 @@
                href="{% url 'judge:problem_delete' problem.course.id problem.id %}">Delete</a>
         {% endif %}
     </h1>
-    <h3 class="h3 font-weight-normal">{{ problem.description }}</h3>
+    <h3 class="h3 font-weight-normal">{{ problem.description | markdown | safe }}</h3>
     {% if perms.judge.view_testcase %}
         <a class="btn btn-success my-1"
            href="{% url 'judge:test_cases' course.id problem.id %}">View test cases</a>

@@ -16,7 +16,7 @@
 {% block content %}
     {% render_breadcrumbs %}
     <h1>{{ problem.title }}</h1>
-    <h2>{{ problem.description }}</h2>
+    <h2>{{ problem.description | markdown | safe }}</h2>
     {% if solution %}
         <h2>Status: {{ solution.get_state_display }}</h2>
         <a class="btn btn-primary btn-bg"

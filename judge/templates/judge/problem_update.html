@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 {% load django_bootstrap_breadcrumbs %}
 {% load bootstrap4 %}
 
@@ -26,4 +27,8 @@
             </article>
         </div>
     </div>
+    <script src="{% static 'scripts/simplemde.min.js' %}"></script>
+    <script>
+        const simpleMDE = new SimpleMDE({ spellChecker: false });
+    </script>
 {% endblock %}
