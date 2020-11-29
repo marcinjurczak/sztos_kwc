@@ -28,7 +28,10 @@ class CourseListView(generic.ListView):
     context_object_name = 'course_list'
 
     def get_queryset(self):
-        return Course.objects.filter(assigned_users__id=self.request.user.id)
+        if self.request.user.has_perm('judge.view_all_courses'):
+            return Course.objects.all()
+        else:
+            return Course.objects.filter(assigned_users__id=self.request.user.id)
 
 
 @method_decorator(permission_required('judge.add_course'), name='dispatch')
@@ -44,7 +47,6 @@ class CourseCreate(generic.CreateView):
             student = User.objects.filter(username=user).first()
             if student:
                 obj.assigned_users.add(student.id)
-        obj.assigned_users.add(self.request.user)
         obj.save()
         return super().form_valid(form)
 
@@ -66,7 +68,6 @@ class CourseUpdate(generic.UpdateView):
             student = User.objects.filter(username=user).first()
             if student:
                 obj.assigned_users.add(student.id)
-        obj.assigned_users.add(self.request.user)
         obj.save()
         return super().form_valid(form)
 
@@ -92,7 +93,6 @@ class CourseAddStudents(generic.UpdateView):
             student = User.objects.filter(username=user).first()
             if student:
                 obj.assigned_users.add(student.id)
-        obj.assigned_users.add(self.request.user)
         obj.save()
         return super().form_valid(form)
 

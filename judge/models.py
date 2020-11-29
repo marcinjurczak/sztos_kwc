@@ -21,6 +21,7 @@ class Course(models.Model):
     class Meta:
         permissions = (
             ("remove_user", "Can remove user"),
+            ("view_all_courses", "Can view all courses")
         )
 
 
