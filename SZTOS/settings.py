@@ -150,3 +150,7 @@ LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
 BREADCRUMBS_TEMPLATE = "django_bootstrap_breadcrumbs/bootstrap4.html"
+
+AUTH_SERVER = "http://89.70.98.188:31113/auth/realms/KWC"
+AUTH_CLIENT_ID = "SZTOS"
+AUTH_CLIENT_SECRET = "ea3e93a2-ce96-4dd1-842c-66ddb05bdec8"

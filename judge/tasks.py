@@ -5,6 +5,7 @@ from celery.utils.log import get_task_logger
 
 from .env.runner import Runner
 from .models import Solution, TestRun
+from django.contrib.auth import get_user_model
 
 
 @shared_task()
