@@ -10,11 +10,15 @@ from django.conf import settings
 from django.contrib import auth
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
+from accounts.models import OpenIdUser
+
 
 def get_user(identity):
     User = get_user_model()
-    print(identity)
-    user, created = User.objects.get_or_create(username=identity['preferred_username'])
+    user, created = User.objects.get_or_create(username=identity['sub'])
+    if created:
+        OpenIdUser.objects.get_or_create(user=user, preferred_username=identity['preferred_username'])
+
     for group in identity['groups']:
         my_group = Group.objects.filter(name=group).first()
         if my_group:
@@ -110,11 +114,11 @@ def callback(request):
     if not code:
         return login_again(request, return_path)
 
+
     res = get_server().request_token(
         redirect_uri=request.build_absolute_uri(reverse("login-done")),
         code=request.GET["code"],
     )
-
     user = get_user(res.id)
     if not user or not user.is_authenticated:
         return login_again(request, return_path)

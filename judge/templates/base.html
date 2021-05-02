@@ -31,7 +31,11 @@
             </ul>
             <ul class="navbar-nav ml-auto">
                 {% if user.is_authenticated %}
+                   {% if user.openiduser %}
+                    <li class="navbar-text m-1">Logged in as {{ user.openiduser.preferred_username }}</li>
+                   {% else %}
                     <li class="navbar-text m-1">Logged in as {{ user }}</li>
+                   {% endif %}
                     <li class="nav-item m-1">
                         <a class="btn btn-outline-danger" href="/auth/logout">Logout</a>
                         {% else %}
