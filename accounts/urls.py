@@ -3,7 +3,6 @@ from django.urls import path
 from accounts import views
 
 urlpatterns = [
-    path('signup/', views.SignUpView.as_view(), name='signup'),
     path('login/', LoginView.as_view(template_name='auth/login.html')),
     path('', views.login, name='login'),
     path('done/', views.callback, name='login-done'),
