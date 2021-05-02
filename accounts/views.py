@@ -19,8 +19,11 @@ def get_user(identity):
     if created:
         OpenIdUser.objects.get_or_create(user=user, preferred_username=identity['preferred_username'])
 
+    user.groups.clear()
     for group in identity['groups']:
-        my_group = Group.objects.filter(name=group).first()
+        if not "SZTOS_" in group:
+            continue
+        my_group = Group.objects.filter(name=group.replace('SZTOS_', '')).first()
         if my_group:
             my_group.user_set.add(user)
     user.backend = 'django.contrib.auth.backends.ModelBackend'
@@ -113,7 +116,6 @@ def callback(request):
 
     if not code:
         return login_again(request, return_path)
-
 
     res = get_server().request_token(
         redirect_uri=request.build_absolute_uri(reverse("login-done")),
